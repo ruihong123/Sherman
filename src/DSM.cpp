@@ -31,26 +31,26 @@ DSM *DSM::getInstance(const DSMConfig &conf) {
 DSM::DSM(const DSMConfig &conf)
     : conf(conf), appID(0), cache(conf.cacheConfig) {
 
-  baseAddr = (uint64_t)hugePageAlloc(conf.dsmSize * define::GB);
+//  baseAddr = (uint64_t)hugePageAlloc(conf.dsmSize * define::GB);
 
-  Debug::notifyInfo("shared memory size: %dGB, 0x%lx", conf.dsmSize, baseAddr);
+//  Debug::notifyInfo("shared memory size: %dGB, 0x%lx", conf.dsmSize, baseAddr);
   Debug::notifyInfo("cache size: %dGB", conf.cacheConfig.cacheSize);
 
   // warmup
   // memset((char *)baseAddr, 0, conf.dsmSize * define::GB);
-  for (uint64_t i = baseAddr; i < baseAddr + conf.dsmSize * define::GB;
-       i += 2 * define::MB) {
-    *(char *)i = 0;
-  }
+//  for (uint64_t i = baseAddr; i < baseAddr + conf.dsmSize * define::GB;
+//       i += 2 * define::MB) {
+//    *(char *)i = 0;
+//  }
+//
+//  // clear up first chunk
+//  memset((char *)baseAddr, 0, define::kChunkSize);
 
-  // clear up first chunk
-  memset((char *)baseAddr, 0, define::kChunkSize);
-
-  initRDMAConnection();
+    initRDMAConnection_Compute();
 
   for (int i = 0; i < NR_DIRECTORY; ++i) {
     dirAgent[i] =
-        new Directory(dirCon[i], remoteInfo, conf.machineNR, i, myNodeID);
+        new Directory(dirCon[i], remoteInfo, conf.MemoryNodeNum, i, myNodeID);
   }
 
   keeper->barrier("DSM-init");
@@ -77,28 +77,34 @@ void DSM::registerThread() {
   }
 }
 
-void DSM::initRDMAConnection() {
+void DSM::initRDMAConnection_Compute() {
 
-  Debug::notifyInfo("Machine NR: %d", conf.machineNR);
+  Debug::notifyInfo("Machine NR: %d", conf.MemoryNodeNum);
 
-  remoteInfo = new RemoteConnection[conf.machineNR];
-
+  remoteInfo = new RemoteConnection[conf.MemoryNodeNum];
+    // every node has MAX_APP_THREAD of local thread, and each server has NR_DIRECTORY of memory regions,
+    // Besides there are conf.MemoryNodeNum of nodes in the cluster
   for (int i = 0; i < MAX_APP_THREAD; ++i) {
+      // the code below just create the queue pair as compute node. also initialize the
+      // local cache memory region on this machine
     thCon[i] =
         new ThreadConnection(i, (void *)cache.data, cache.size * define::GB,
-                             conf.machineNR, remoteInfo);
+                             conf.MemoryNodeNum, remoteInfo);
   }
 
-  for (int i = 0; i < NR_DIRECTORY; ++i) {
-    dirCon[i] =
-        new DirectoryConnection(i, (void *)baseAddr, conf.dsmSize * define::GB,
-                                conf.machineNR, remoteInfo);
-  }
-
-  keeper = new DSMKeeper(thCon, dirCon, remoteInfo, conf.machineNR);
-
+//  for (int i = 0; i < NR_DIRECTORY; ++i) {
+//      // the connection below just create the queue pair for DSM. also initialize the DSM memory region
+//      // in this machine.
+//    dirCon[i] =
+//        new DirectoryConnection(i, (void *)baseAddr, conf.dsmSize * define::GB,
+//                                conf.MemoryNodeNum, remoteInfo);
+//  }
+  // THe DSM keeper will set up the queue pair connection
+  keeper = new DSMKeeper(thCon, dirCon, remoteInfo, conf.MemoryNodeNum);
+  keeper->initialization();
   myNodeID = keeper->getMyNodeID();
 }
+
 
 void DSM::read(char *buffer, GlobalAddress gaddr, size_t size, bool signal,
                CoroContext *ctx) {
@@ -325,50 +331,50 @@ bool DSM::cas_sync(GlobalAddress gaddr, uint64_t equal, uint64_t val,
   return equal == *rdma_buffer;
 }
 
-void DSM::cas_mask(GlobalAddress gaddr, uint64_t equal, uint64_t val,
-                   uint64_t *rdma_buffer, uint64_t mask, bool signal) {
-  rdmaCompareAndSwapMask(iCon->data[0][gaddr.nodeID], (uint64_t)rdma_buffer,
-                         remoteInfo[gaddr.nodeID].dsmBase + gaddr.offset, equal,
-                         val, iCon->cacheLKey,
-                         remoteInfo[gaddr.nodeID].dsmRKey[0], mask, signal);
-}
+//void DSM::cas_mask(GlobalAddress gaddr, uint64_t equal, uint64_t val,
+//                   uint64_t *rdma_buffer, uint64_t mask, bool signal) {
+//  rdmaCompareAndSwapMask(iCon->data[0][gaddr.nodeID], (uint64_t)rdma_buffer,
+//                         remoteInfo[gaddr.nodeID].dsmBase + gaddr.offset, equal,
+//                         val, iCon->cacheLKey,
+//                         remoteInfo[gaddr.nodeID].dsmRKey[0], mask, signal);
+//}
 
-bool DSM::cas_mask_sync(GlobalAddress gaddr, uint64_t equal, uint64_t val,
-                        uint64_t *rdma_buffer, uint64_t mask) {
-  cas_mask(gaddr, equal, val, rdma_buffer, mask);
-  ibv_wc wc;
-  pollWithCQ(iCon->cq, 1, &wc);
+//bool DSM::cas_mask_sync(GlobalAddress gaddr, uint64_t equal, uint64_t val,
+//                        uint64_t *rdma_buffer, uint64_t mask) {
+//  cas_mask(gaddr, equal, val, rdma_buffer, mask);
+//  ibv_wc wc;
+//  pollWithCQ(iCon->cq, 1, &wc);
+//
+//  return (equal & mask) == (*rdma_buffer & mask);
+//}
 
-  return (equal & mask) == (*rdma_buffer & mask);
-}
+//void DSM::faa_boundary(GlobalAddress gaddr, uint64_t add_val,
+//                       uint64_t *rdma_buffer, uint64_t mask, bool signal,
+//                       CoroContext *ctx) {
+//  if (ctx == nullptr) {
+//    rdmaFetchAndAddBoundary(iCon->data[0][gaddr.nodeID], (uint64_t)rdma_buffer,
+//                            remoteInfo[gaddr.nodeID].dsmBase + gaddr.offset,
+//                            add_val, iCon->cacheLKey,
+//                            remoteInfo[gaddr.nodeID].dsmRKey[0], mask, signal);
+//  } else {
+//    rdmaFetchAndAddBoundary(iCon->data[0][gaddr.nodeID], (uint64_t)rdma_buffer,
+//                            remoteInfo[gaddr.nodeID].dsmBase + gaddr.offset,
+//                            add_val, iCon->cacheLKey,
+//                            remoteInfo[gaddr.nodeID].dsmRKey[0], mask, true,
+//                            ctx->coro_id);
+//    (*ctx->yield)(*ctx->master);
+//  }
+//}
 
-void DSM::faa_boundary(GlobalAddress gaddr, uint64_t add_val,
-                       uint64_t *rdma_buffer, uint64_t mask, bool signal,
-                       CoroContext *ctx) {
-  if (ctx == nullptr) {
-    rdmaFetchAndAddBoundary(iCon->data[0][gaddr.nodeID], (uint64_t)rdma_buffer,
-                            remoteInfo[gaddr.nodeID].dsmBase + gaddr.offset,
-                            add_val, iCon->cacheLKey,
-                            remoteInfo[gaddr.nodeID].dsmRKey[0], mask, signal);
-  } else {
-    rdmaFetchAndAddBoundary(iCon->data[0][gaddr.nodeID], (uint64_t)rdma_buffer,
-                            remoteInfo[gaddr.nodeID].dsmBase + gaddr.offset,
-                            add_val, iCon->cacheLKey,
-                            remoteInfo[gaddr.nodeID].dsmRKey[0], mask, true,
-                            ctx->coro_id);
-    (*ctx->yield)(*ctx->master);
-  }
-}
-
-void DSM::faa_boundary_sync(GlobalAddress gaddr, uint64_t add_val,
-                            uint64_t *rdma_buffer, uint64_t mask,
-                            CoroContext *ctx) {
-  faa_boundary(gaddr, add_val, rdma_buffer, mask, true, ctx);
-  if (ctx == nullptr) {
-    ibv_wc wc;
-    pollWithCQ(iCon->cq, 1, &wc);
-  }
-}
+//void DSM::faa_boundary_sync(GlobalAddress gaddr, uint64_t add_val,
+//                            uint64_t *rdma_buffer, uint64_t mask,
+//                            CoroContext *ctx) {
+//  faa_boundary(gaddr, add_val, rdma_buffer, mask, true, ctx);
+//  if (ctx == nullptr) {
+//    ibv_wc wc;
+//    pollWithCQ(iCon->cq, 1, &wc);
+//  }
+//}
 
 void DSM::read_dm(char *buffer, GlobalAddress gaddr, size_t size, bool signal,
                   CoroContext *ctx) {
@@ -452,52 +458,52 @@ bool DSM::cas_dm_sync(GlobalAddress gaddr, uint64_t equal, uint64_t val,
   return equal == *rdma_buffer;
 }
 
-void DSM::cas_dm_mask(GlobalAddress gaddr, uint64_t equal, uint64_t val,
-                      uint64_t *rdma_buffer, uint64_t mask, bool signal) {
-  rdmaCompareAndSwapMask(iCon->data[0][gaddr.nodeID], (uint64_t)rdma_buffer,
-                         remoteInfo[gaddr.nodeID].lockBase + gaddr.offset,
-                         equal, val, iCon->cacheLKey,
-                         remoteInfo[gaddr.nodeID].lockRKey[0], mask, signal);
-}
+//void DSM::cas_dm_mask(GlobalAddress gaddr, uint64_t equal, uint64_t val,
+//                      uint64_t *rdma_buffer, uint64_t mask, bool signal) {
+//  rdmaCompareAndSwapMask(iCon->data[0][gaddr.nodeID], (uint64_t)rdma_buffer,
+//                         remoteInfo[gaddr.nodeID].lockBase + gaddr.offset,
+//                         equal, val, iCon->cacheLKey,
+//                         remoteInfo[gaddr.nodeID].lockRKey[0], mask, signal);
+//}
 
-bool DSM::cas_dm_mask_sync(GlobalAddress gaddr, uint64_t equal, uint64_t val,
-                           uint64_t *rdma_buffer, uint64_t mask) {
-  cas_dm_mask(gaddr, equal, val, rdma_buffer, mask);
-  ibv_wc wc;
-  pollWithCQ(iCon->cq, 1, &wc);
-
-  return (equal & mask) == (*rdma_buffer & mask);
-}
-
-void DSM::faa_dm_boundary(GlobalAddress gaddr, uint64_t add_val,
-                          uint64_t *rdma_buffer, uint64_t mask, bool signal,
-                          CoroContext *ctx) {
-  if (ctx == nullptr) {
-
-    rdmaFetchAndAddBoundary(iCon->data[0][gaddr.nodeID], (uint64_t)rdma_buffer,
-                            remoteInfo[gaddr.nodeID].lockBase + gaddr.offset,
-                            add_val, iCon->cacheLKey,
-                            remoteInfo[gaddr.nodeID].lockRKey[0], mask, signal);
-  } else {
-    rdmaFetchAndAddBoundary(iCon->data[0][gaddr.nodeID], (uint64_t)rdma_buffer,
-                            remoteInfo[gaddr.nodeID].lockBase + gaddr.offset,
-                            add_val, iCon->cacheLKey,
-                            remoteInfo[gaddr.nodeID].lockRKey[0], mask, true,
-                            ctx->coro_id);
-    (*ctx->yield)(*ctx->master);
-  }
-}
-
-void DSM::faa_dm_boundary_sync(GlobalAddress gaddr, uint64_t add_val,
-                               uint64_t *rdma_buffer, uint64_t mask,
-                               CoroContext *ctx) {
-  faa_dm_boundary(gaddr, add_val, rdma_buffer, mask, true, ctx);
-  if (ctx == nullptr) {
-    ibv_wc wc;
-    pollWithCQ(iCon->cq, 1, &wc);
-  }
-}
-
+//bool DSM::cas_dm_mask_sync(GlobalAddress gaddr, uint64_t equal, uint64_t val,
+//                           uint64_t *rdma_buffer, uint64_t mask) {
+//  cas_dm_mask(gaddr, equal, val, rdma_buffer, mask);
+//  ibv_wc wc;
+//  pollWithCQ(iCon->cq, 1, &wc);
+//
+//  return (equal & mask) == (*rdma_buffer & mask);
+//}
+//
+//void DSM::faa_dm_boundary(GlobalAddress gaddr, uint64_t add_val,
+//                          uint64_t *rdma_buffer, uint64_t mask, bool signal,
+//                          CoroContext *ctx) {
+//  if (ctx == nullptr) {
+//
+//    rdmaFetchAndAddBoundary(iCon->data[0][gaddr.nodeID], (uint64_t)rdma_buffer,
+//                            remoteInfo[gaddr.nodeID].lockBase + gaddr.offset,
+//                            add_val, iCon->cacheLKey,
+//                            remoteInfo[gaddr.nodeID].lockRKey[0], mask, signal);
+//  } else {
+//    rdmaFetchAndAddBoundary(iCon->data[0][gaddr.nodeID], (uint64_t)rdma_buffer,
+//                            remoteInfo[gaddr.nodeID].lockBase + gaddr.offset,
+//                            add_val, iCon->cacheLKey,
+//                            remoteInfo[gaddr.nodeID].lockRKey[0], mask, true,
+//                            ctx->coro_id);
+//    (*ctx->yield)(*ctx->master);
+//  }
+//}
+//
+//void DSM::faa_dm_boundary_sync(GlobalAddress gaddr, uint64_t add_val,
+//                               uint64_t *rdma_buffer, uint64_t mask,
+//                               CoroContext *ctx) {
+//  faa_dm_boundary(gaddr, add_val, rdma_buffer, mask, true, ctx);
+//  if (ctx == nullptr) {
+//    ibv_wc wc;
+//    pollWithCQ(iCon->cq, 1, &wc);
+//  }
+//}
+//
 uint64_t DSM::poll_rdma_cq(int count) {
   ibv_wc wc;
   pollWithCQ(iCon->cq, count, &wc);

@@ -13,12 +13,13 @@ public:
 class DSMConfig {
 public:
   CacheConfig cacheConfig;
-  uint32_t machineNR;
+  uint32_t MemoryNodeNum;
+  uint32_t ComputeNodeNum;
   uint64_t dsmSize; // G
 
   DSMConfig(const CacheConfig &cacheConfig = CacheConfig(),
             uint32_t machineNR = 2, uint64_t dsmSize = 8)
-      : cacheConfig(cacheConfig), machineNR(machineNR), dsmSize(dsmSize) {}
+      : cacheConfig(cacheConfig), MemoryNodeNum(machineNR), dsmSize(dsmSize) {}
 };
 
 #endif /* __CONFIG_H__ */

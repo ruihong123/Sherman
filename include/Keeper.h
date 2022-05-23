@@ -17,25 +17,54 @@
 #include "Config.h"
 #include "Debug.h"
 #include "Rdma.h"
+enum NodeType {Compute, Memory};
+struct ExPerThread {
+    uint16_t lid;
+    uint8_t gid[16];
 
+    uint32_t rKey;
+
+    uint32_t lock_rkey; //for directory on-chip memory
+} __attribute__((packed));
+
+struct ExchangeMeta {
+    NodeType node_type;
+    uint64_t dsmBase;
+    uint64_t cacheBase;
+    uint64_t lockBase;
+
+    ExPerThread appTh[MAX_APP_THREAD];
+    ExPerThread dirTh[NR_DIRECTORY];
+
+    uint32_t appUdQpn[MAX_APP_THREAD];
+    uint32_t dirUdQpn[NR_DIRECTORY];
+
+    uint32_t appRcQpn2dir[MAX_APP_THREAD][NR_DIRECTORY];
+
+    uint32_t dirRcQpn2app[NR_DIRECTORY][MAX_APP_THREAD];
+
+} __attribute__((packed));
 class Keeper {
 
 private:
-  static const char *SERVER_NUM_KEY;
 
-  uint32_t maxServer;
-  uint16_t curServer;
-  uint16_t myNodeID;
-  std::string myIP;
-  uint16_t myPort;
-
-  memcached_st *memc;
 
 protected:
+    static const char *COMPUTE_NUM_KEY;
+    static const char *MEMORY_NUM_KEY;
+    uint32_t maxServer;
+
+    uint16_t curServer;
+    uint16_t myNodeID;
+    std::string myIP;
+    uint16_t myPort;
+
+    memcached_st *memc;
   bool connectMemcached();
   bool disconnectMemcached();
-  void serverConnect();
-  void serverEnter();
+
+  virtual void serverEnter();
+  virtual void serverConnect();
   virtual bool connectNode(uint16_t remoteID) = 0;
 
 

@@ -15,6 +15,7 @@ ThreadConnection::ThreadConnection(uint16_t threadID, void *cachePool,
   message = new RawMessageConnection(ctx, rpc_cq, APP_MESSAGE_NR);
 
   this->cachePool = cachePool;
+  //This create Memory Region will register the same memory muliptle times.
   cacheMR = createMemoryRegion((uint64_t)cachePool, cacheSize, &ctx);
   cacheLKey = cacheMR->lkey;
 

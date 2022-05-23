@@ -81,9 +81,9 @@ Tree::Tree(DSM *dsm, uint16_t tree_id) : dsm(dsm), tree_id(tree_id) {
 
 void Tree::print_verbose() {
 
-  constexpr int kLeafHdrOffset = STRUCT_OFFSET(LeafPage, hdr);
-  constexpr int kInternalHdrOffset = STRUCT_OFFSET(InternalPage, hdr);
-  static_assert(kLeafHdrOffset == kInternalHdrOffset, "XXX");
+  int kLeafHdrOffset = STRUCT_OFFSET(LeafPage, hdr);
+  int kInternalHdrOffset = STRUCT_OFFSET(InternalPage, hdr);
+  assert(kLeafHdrOffset == kInternalHdrOffset);
 
   if (dsm->getMyNodeID() == 0) {
     std::cout << "Header size: " << sizeof(Header) << std::endl;
@@ -403,6 +403,7 @@ void Tree::insert(const Key &k, const Value &v, CoroContext *cxt, int coro_id) {
         if (res == HotResult::SUCC) {
           hot_buf.clear(k);
         }
+        //Why we can return here?
         return;
       }
       // cache stale, from root,
@@ -415,7 +416,7 @@ void Tree::insert(const Key &k, const Value &v, CoroContext *cxt, int coro_id) {
   SearchResult result;
 
   GlobalAddress p = root;
-
+//The page_search will be executed mulitple times if the result is not is_leaf
 next:
 
   if (!page_search(p, k, result, cxt, coro_id)) {
@@ -424,7 +425,8 @@ next:
     sleep(1);
     goto next;
   }
-
+//The page_search will be executed mulitple times if the result is not is_leaf
+// Maybe it will goes to the sibling pointer or go to the children
   if (!result.is_leaf) {
     assert(result.level != 0);
     if (result.slibing != GlobalAddress::Null()) {
@@ -616,7 +618,7 @@ next:
 
   leaf_page_del(p, k, 0, cxt, coro_id);
 }
-
+//Node ID for a tree pointer should be the id in the Memory pool
 bool Tree::page_search(GlobalAddress page_addr, const Key &k,
                        SearchResult &result, CoroContext *cxt, int coro_id,
                        bool from_cache) {
@@ -689,12 +691,13 @@ re_read:
       assert(false);
       return false;
     }
+    // this function will add the children pointer to the result.
     internal_page_search(page, k, result);
   }
 
   return true;
 }
-
+// internal page serach will return the global point for the next level
 void Tree::internal_page_search(InternalPage *page, const Key &k,
                                 SearchResult &result) {
 

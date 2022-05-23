@@ -251,7 +251,7 @@ int main(int argc, char *argv[]) {
   parse_args(argc, argv);
 
   DSMConfig config;
-  config.machineNR = kNodeCount;
+  config.MemoryNodeNum = kNodeCount;
   dsm = DSM::getInstance(config);
 
   dsm->registerThread();

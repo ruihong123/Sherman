@@ -22,7 +22,7 @@ public:
 
   uint16_t getMyNodeID() { return myNodeID; }
   uint16_t getMyThreadID() { return thread_id; }
-  uint16_t getClusterSize() { return conf.machineNR; }
+  uint16_t getClusterSize() { return conf.MemoryNodeNum; }
   uint64_t getThreadTag() { return thread_tag; }
 
   // RDMA operations
@@ -64,18 +64,18 @@ public:
   bool cas_read_sync(RdmaOpRegion &cas_ror, RdmaOpRegion &read_ror,
                      uint64_t equal, uint64_t val, CoroContext *ctx = nullptr);
 
-  void cas_mask(GlobalAddress gaddr, uint64_t equal, uint64_t val,
-                uint64_t *rdma_buffer, uint64_t mask = ~(0ull),
-                bool signal = true);
-  bool cas_mask_sync(GlobalAddress gaddr, uint64_t equal, uint64_t val,
-                     uint64_t *rdma_buffer, uint64_t mask = ~(0ull));
+//  void cas_mask(GlobalAddress gaddr, uint64_t equal, uint64_t val,
+//                uint64_t *rdma_buffer, uint64_t mask = ~(0ull),
+//                bool signal = true);
+//  bool cas_mask_sync(GlobalAddress gaddr, uint64_t equal, uint64_t val,
+//                     uint64_t *rdma_buffer, uint64_t mask = ~(0ull));
 
   void faa_boundary(GlobalAddress gaddr, uint64_t add_val,
                     uint64_t *rdma_buffer, uint64_t mask = 63,
                     bool signal = true, CoroContext *ctx = nullptr);
-  void faa_boundary_sync(GlobalAddress gaddr, uint64_t add_val,
-                         uint64_t *rdma_buffer, uint64_t mask = 63,
-                         CoroContext *ctx = nullptr);
+//  void faa_boundary_sync(GlobalAddress gaddr, uint64_t add_val,
+//                         uint64_t *rdma_buffer, uint64_t mask = 63,
+//                         CoroContext *ctx = nullptr);
 
   // for on-chip device memory
   void read_dm(char *buffer, GlobalAddress gaddr, size_t size,
@@ -94,18 +94,18 @@ public:
   bool cas_dm_sync(GlobalAddress gaddr, uint64_t equal, uint64_t val,
                    uint64_t *rdma_buffer, CoroContext *ctx = nullptr);
 
-  void cas_dm_mask(GlobalAddress gaddr, uint64_t equal, uint64_t val,
-                   uint64_t *rdma_buffer, uint64_t mask = ~(0ull),
-                   bool signal = true);
-  bool cas_dm_mask_sync(GlobalAddress gaddr, uint64_t equal, uint64_t val,
-                        uint64_t *rdma_buffer, uint64_t mask = ~(0ull));
+//  void cas_dm_mask(GlobalAddress gaddr, uint64_t equal, uint64_t val,
+//                   uint64_t *rdma_buffer, uint64_t mask = ~(0ull),
+//                   bool signal = true);
+//  bool cas_dm_mask_sync(GlobalAddress gaddr, uint64_t equal, uint64_t val,
+//                        uint64_t *rdma_buffer, uint64_t mask = ~(0ull));
 
-  void faa_dm_boundary(GlobalAddress gaddr, uint64_t add_val,
-                       uint64_t *rdma_buffer, uint64_t mask = 63,
-                       bool signal = true, CoroContext *ctx = nullptr);
-  void faa_dm_boundary_sync(GlobalAddress gaddr, uint64_t add_val,
-                            uint64_t *rdma_buffer, uint64_t mask = 63,
-                            CoroContext *ctx = nullptr);
+//  void faa_dm_boundary(GlobalAddress gaddr, uint64_t add_val,
+//                       uint64_t *rdma_buffer, uint64_t mask = 63,
+//                       bool signal = true, CoroContext *ctx = nullptr);
+//  void faa_dm_boundary_sync(GlobalAddress gaddr, uint64_t add_val,
+//                            uint64_t *rdma_buffer, uint64_t mask = 63,
+//                            CoroContext *ctx = nullptr);
 
   uint64_t poll_rdma_cq(int count = 1);
   bool poll_rdma_cq_once(uint64_t &wr_id);
@@ -137,7 +137,8 @@ private:
   DSM(const DSMConfig &conf);
   ~DSM();
 
-  void initRDMAConnection();
+  void initRDMAConnection_Compute();
+//  void initRDMAConnection_Memory();
   void fill_keys_dest(RdmaOpRegion &ror, GlobalAddress addr, bool is_chip);
 
   DSMConfig conf;
@@ -151,7 +152,7 @@ private:
   static thread_local RdmaBuffer rbuf[define::kMaxCoro];
   static thread_local uint64_t thread_tag;
 
-  uint64_t baseAddr;
+//  uint64_t baseAddr;
   uint32_t myNodeID;
 
   RemoteConnection *remoteInfo;
@@ -194,7 +195,7 @@ public:
 inline GlobalAddress DSM::alloc(size_t size) {
 
   thread_local int next_target_node =
-      (getMyThreadID() + getMyNodeID()) % conf.machineNR;
+      (getMyThreadID() + getMyNodeID()) % conf.MemoryNodeNum;
   thread_local int next_target_dir_id =
       (getMyThreadID() + getMyNodeID()) % NR_DIRECTORY;
 
@@ -208,7 +209,7 @@ inline GlobalAddress DSM::alloc(size_t size) {
     local_allocator.set_chunck(rpc_wait()->addr);
 
     if (++next_target_dir_id == NR_DIRECTORY) {
-      next_target_node = (next_target_node + 1) % conf.machineNR;
+      next_target_node = (next_target_node + 1) % conf.MemoryNodeNum;
       next_target_dir_id = 0;
     }
 

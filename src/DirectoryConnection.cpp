@@ -9,6 +9,7 @@ DirectoryConnection::DirectoryConnection(uint16_t dirID, void *dsmPool,
 
   createContext(&ctx);
   cq = ibv_create_cq(ctx.ctx, RAW_RECV_CQ_COUNT, NULL, NULL, 0);
+  // RawMessage connection is a unreliable connection.
   message = new RawMessageConnection(ctx, cq, DIR_MESSAGE_NR);
 
   message->initRecv();
@@ -24,8 +25,10 @@ DirectoryConnection::DirectoryConnection(uint16_t dirID, void *dsmPool,
   if (dirID == 0) {
     this->lockPool = (void *)define::kLockStartAddr;
     this->lockSize = define::kLockChipMemSize;
-    this->lockMR = createMemoryRegionOnChip((uint64_t)this->lockPool,
-                                            this->lockSize, &ctx);
+//    this->lockMR = createMemoryRegionOnChip((uint64_t)this->lockPool,
+//                                            this->lockSize, &ctx);
+    this->lockMR = createMemoryRegion((uint64_t)this->lockPool,
+                                              this->lockSize, &ctx);
     this->lockLKey = lockMR->lkey;
   }
 
