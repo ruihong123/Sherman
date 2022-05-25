@@ -141,7 +141,7 @@ inline const CacheEntry *IndexCache::search_from_cache(const Key &k,
 
   InternalPage *page = entry ? entry->ptr : nullptr;
 
-  if (page && entry->from <= k && entry->to >= k) {
+  if (page && entry->from <= k && entry->to >= k) {// this track will definitely happen
 
     // if (enter_debug) {
     //   page->verbose_debug();
@@ -163,6 +163,7 @@ inline const CacheEntry *IndexCache::search_from_cache(const Key &k,
         }
       }
       if (!find) {
+          // addr is the target leaf node that may contain the key.
         *addr = page->records[cnt - 1].ptr;
       }
     }

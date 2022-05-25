@@ -393,6 +393,9 @@ void Tree::insert(const Key &k, const Value &v, CoroContext *cxt, int coro_id) {
 
   if (enable_cache) {
     GlobalAddress cache_addr;
+    //The cache here is a skip list mapping from key(from, to) to a cached internal node. when searching the
+    // only when the from and to are both equal the entry in the skip list, then there will be cache hit. This is actually
+    // a tuple level cache, which may not has a large cache locality.
     auto entry = index_cache->search_from_cache(k, &cache_addr);
     if (entry) { // cache hit
       auto root = get_root_ptr(cxt, coro_id);
@@ -673,6 +676,8 @@ re_read:
     }
 
     if (result.level == 1 && enable_cache) {
+        // add the pointer of this internal page into cache. Why it make sense?
+
       index_cache->add_to_cache(page);
       // if (enter_debug) {
       //   printf("add %lud [%lud %lud]\n", k, page->hdr.lowest,

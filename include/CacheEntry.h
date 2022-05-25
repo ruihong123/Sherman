@@ -33,7 +33,8 @@ struct CacheEntryComparator {
   typedef CacheEntry DecodedType;
 
   static DecodedType decode_key(const char *b) { return Decode(b); }
-
+    // todo: make this cmp return 0 when the b_v [from,to] is within the scope of
+    // the a_v 's [from,to]
   int cmp(const DecodedType a_v, const DecodedType b_v) const {
     if (a_v.to < b_v.to) {
       return -1;

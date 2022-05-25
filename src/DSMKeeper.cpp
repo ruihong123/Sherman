@@ -72,10 +72,10 @@ void DSMKeeper::serverConnect() {
 
         // /connect server K
         for (size_t k = curServer; k < serverNum; ++k) {
-//            if (k != myNodeID) {
+            if (k != myNodeID) {
                 connectNode(k);
                 printf("I connect server %zu\n", k);
-//            }
+            }
         }
         curServer = serverNum;
     }
@@ -90,8 +90,7 @@ bool DSMKeeper::connectNode(uint16_t remoteID) {
 
   std::string getK = getKey(remoteID);
   ExchangeMeta *remoteMeta = (ExchangeMeta *)memGet(getK.c_str(), getK.size());
-//  if (remoteMeta->node_type == Memory)
-    assert(remoteMeta->node_type == Memory);
+  if (remoteMeta->node_type == Memory)
     setDataFromRemote(remoteID, remoteMeta);
 
   free(remoteMeta);
@@ -117,34 +116,34 @@ void DSMKeeper::setDataToRemote(uint16_t remoteID) {
 }
 
 void DSMKeeper::setDataFromRemote(uint16_t remoteID, ExchangeMeta *remoteMeta) {
-//  for (int i = 0; i < NR_DIRECTORY; ++i) {
-//    auto &c = dirCon[i];
-//
-//    for (int k = 0; k < MAX_APP_THREAD; ++k) {
-//      auto &qp = c->data2app[k][remoteID];
-//
-//      assert(qp->qp_type == IBV_QPT_RC);
-//      modifyQPtoInit(qp, &c->ctx);
-//      modifyQPtoRTR(qp, remoteMeta->appRcQpn2dir[k][i],
-//                    remoteMeta->appTh[k].lid, remoteMeta->appTh[k].gid,
-//                    &c->ctx);
-//      modifyQPtoRTS(qp);
-//    }
-//  }
+  for (int i = 0; i < NR_DIRECTORY; ++i) {
+    auto &c = dirCon[i];
 
-  for (int i = 0; i < MAX_APP_THREAD; ++i) {
-    auto &c = thCon[i];
-    for (int k = 0; k < NR_DIRECTORY; ++k) {
-      auto &qp = c->data[k][remoteID];
+    for (int k = 0; k < MAX_APP_THREAD; ++k) {
+      auto &qp = c->data2app[k][remoteID];
 
       assert(qp->qp_type == IBV_QPT_RC);
       modifyQPtoInit(qp, &c->ctx);
-      modifyQPtoRTR(qp, remoteMeta->dirRcQpn2app[k][i],
-                    remoteMeta->dirTh[k].lid, remoteMeta->dirTh[k].gid,
+      modifyQPtoRTR(qp, remoteMeta->appRcQpn2dir[k][i],
+                    remoteMeta->appTh[k].lid, remoteMeta->appTh[k].gid,
                     &c->ctx);
       modifyQPtoRTS(qp);
     }
   }
+
+//  for (int i = 0; i < MAX_APP_THREAD; ++i) {
+//    auto &c = thCon[i];
+//    for (int k = 0; k < NR_DIRECTORY; ++k) {
+//      auto &qp = c->data[k][remoteID];
+//
+//      assert(qp->qp_type == IBV_QPT_RC);
+//      modifyQPtoInit(qp, &c->ctx);
+//      modifyQPtoRTR(qp, remoteMeta->dirRcQpn2app[k][i],
+//                    remoteMeta->dirTh[k].lid, remoteMeta->dirTh[k].gid,
+//                    &c->ctx);
+//      modifyQPtoRTS(qp);
+//    }
+//  }
 
   auto &info = remoteCon[remoteID];
   info.dsmBase = remoteMeta->dsmBase;
