@@ -72,10 +72,10 @@ void DSMKeeper::serverConnect() {
 
         // /connect server K
         for (size_t k = curServer; k < serverNum; ++k) {
-            if (k != myNodeID) {
+//            if (k != myNodeID) {
                 connectNode(k);
                 printf("I connect server %zu\n", k);
-            }
+//            }
         }
         curServer = serverNum;
     }

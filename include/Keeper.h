@@ -63,8 +63,8 @@ protected:
   bool connectMemcached();
   bool disconnectMemcached();
 
-  virtual void serverEnter();
-  virtual void serverConnect();
+  virtual void serverEnter() = 0;
+  virtual void serverConnect() = 0;
   virtual bool connectNode(uint16_t remoteID) = 0;
 
 
