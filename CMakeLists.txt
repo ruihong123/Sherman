@@ -27,7 +27,8 @@ set(COMMON_SRC ${PROJECT_SOURCE_DIR}/src)
 file(GLOB_RECURSE COMMON_FILE ${COMMON_SRC}/*.cpp)
 add_library(sherman STATIC ${COMMON_FILE})
 link_libraries(sherman)
-
+add_executable(MemoryServer memoryserver.cpp )
+target_link_libraries(MemoryServer ${LINKS_FLAGS})
 # test
 
 file(GLOB TEST_SRC ${PROJECT_SOURCE_DIR}/test/*.cpp)

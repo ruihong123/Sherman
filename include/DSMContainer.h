@@ -6,7 +6,8 @@
 #define SHERMAN_DSMCONTAINER_H
 
 #include <vector>
-
+#include "DirectoryConnection.h"
+#include "Connection.h"
 #include "Keeper.h"
 
 struct ThreadConnection;
@@ -52,6 +53,7 @@ public:
     DSMContainer(ThreadConnection **thCon, DirectoryConnection **dirCon,
                  const DSMConfig &conf, uint32_t maxServer = 12)
     : Keeper(maxServer), thCon(thCon), dirCon(dirCon) {
+
         remoteCon = new RemoteConnection[conf.ComputeNodeNum];
 
         baseAddr = (uint64_t)hugePageAlloc(conf.dsmSize * define::GB);
