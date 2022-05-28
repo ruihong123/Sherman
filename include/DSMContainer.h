@@ -56,7 +56,8 @@ public:
 
         remoteCon = new RemoteConnection[conf.ComputeNodeNum];
 
-        baseAddr = (uint64_t)hugePageAlloc(conf.dsmSize * define::GB);
+//        baseAddr = (uint64_t)hugePageAlloc(conf.dsmSize * define::GB);
+        baseAddr = reinterpret_cast<uint64_t>(malloc(1024 * 1024 * 1024));
         for (uint64_t i = baseAddr; i < baseAddr + conf.dsmSize * define::GB;
              i += 2 * define::MB) {
             *(char *)i = 0;
