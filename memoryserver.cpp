@@ -7,7 +7,7 @@ int kThreadCount;
 int kComputeNodeCount;
 int kMemoryNodeCount;
 void parse_args(int argc, char *argv[]) {
-    if (argc != 4) {
+    if (argc != 5) {
         printf("Usage: ./benchmark kComputeNodeCount kReadRatio kThreadCount\n");
         exit(-1);
     }
