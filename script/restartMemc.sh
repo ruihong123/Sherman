@@ -7,7 +7,7 @@ port=$(awk 'NR==2{print}' ../memcached.conf)
 ssh ${addr} "cat /tmp/memcached.pid | xargs kill"
 
 # launch memcached
-ssh ${addr} "memcached -u Ruihong -l ${addr} -p  ${port} -c 10000 -d -P /tmp/memcached.pid"
+ssh -o StrictHostKeyChecking=no ${addr} "memcached -u root -l ${addr} -p  ${port} -c 10000 -d -P /tmp/memcached.pid"
 sleep 1
 
 # init 
