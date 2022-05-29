@@ -257,7 +257,7 @@ int main(int argc, char *argv[]) {
 
   DSMConfig config;
   config.ComputeNodeNum = kComputeNodeCount;
-  config.MemoryNodeNum = kComputeNodeCount;
+  config.MemoryNodeNum = kMemoryNodeCount;
   dsm = DSM::getInstance(config);
 
   dsm->registerThread();

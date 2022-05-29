@@ -23,12 +23,12 @@ void parse_args(int argc, char *argv[]) {
 int main(int argc,char* argv[])
 {
     parse_args(argc, argv);
-    DSMConfig config;
-    config.ComputeNodeNum = kComputeNodeCount;
-    config.MemoryNodeNum = kComputeNodeCount;
+    DSMConfig conf;
+    conf.ComputeNodeNum = kComputeNodeCount;
+    conf.MemoryNodeNum = kMemoryNodeCount;
     ThreadConnection *thCon[MAX_APP_THREAD];
     DirectoryConnection *dirCon[NR_DIRECTORY];
-    DSMConfig conf;
+//    DSMConfig conf;
     auto keeper = new DSMContainer(thCon, dirCon, conf, conf.ComputeNodeNum);
 
     keeper->initialization();
