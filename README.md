@@ -31,7 +31,7 @@ For more details, please refer to our [paper](https://arxiv.org/abs/2112.07320):
 - configure `../memcached.conf`, where the 1st line is memcached IP, the 2nd is memcached port
 
 For each run:
-- `./restartMemc.sh` (to initialize memcached server)
+- `bash ./restartMemc.sh` (to initialize memcached server)
 - In each server, execute `./benchmark kNodeCount kReadRatio kThreadCount`
 
 >  We emulate each server as one compute node and one memory node: In each server, as the compute node, 
