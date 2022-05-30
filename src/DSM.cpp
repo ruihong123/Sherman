@@ -48,10 +48,10 @@ DSM::DSM(const DSMConfig &conf)
 
     initRDMAConnection_Compute();
 
-  for (int i = 0; i < NR_DIRECTORY; ++i) {
-    dirAgent[i] =
-        new Directory(dirCon[i], remoteInfo, conf.MemoryNodeNum, i, myNodeID);
-  }
+//  for (int i = 0; i < NR_DIRECTORY; ++i) {
+//    dirAgent[i] =
+//        new Directory(dirCon[i], remoteInfo, conf.MemoryNodeNum, i, myNodeID);
+//  }
 
   keeper->barrier("DSM-init");
 }
