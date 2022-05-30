@@ -1,5 +1,5 @@
 #include "Rdma.h"
-
+#include <iostream>
 bool createContext(RdmaContext *context, uint8_t port, int gidIndex,
                    uint8_t devIndex) {
 
@@ -7,6 +7,7 @@ bool createContext(RdmaContext *context, uint8_t port, int gidIndex,
   ibv_context *ctx = NULL;
   ibv_pd *pd = NULL;
   ibv_port_attr portAttr;
+  struct ibv_device_attr device_attr;
 
   // get device names in the system
   int devicesNum;
@@ -62,6 +63,16 @@ bool createContext(RdmaContext *context, uint8_t port, int gidIndex,
     Debug::notifyError("ibv_alloc_pd failed");
     goto CreateResourcesExit;
   }
+    ibv_query_device(ctx, &(device_attr));
+    std::cout << "maximum outstanding wr number is"  << device_attr.max_qp_wr <<std::endl;
+    std::cout << "maximum query pair number is" << device_attr.max_qp
+              << std::endl;
+    std::cout << "maximum completion queue number is" << device_attr.max_cq
+              << std::endl;
+    std::cout << "maximum memory region number is" << device_attr.max_mr
+              << std::endl;
+    std::cout << "maximum memory region size is" << device_attr.max_mr_size
+              << std::endl;
 
   if (ibv_query_gid(ctx, port, gidIndex, &context->gid)) {
     Debug::notifyError("could not get gid for port: %d, gidIndex: %d", port,
@@ -125,13 +136,40 @@ bool destoryContext(RdmaContext *context) {
 ibv_mr *createMemoryRegion(uint64_t mm, uint64_t mmSize, RdmaContext *ctx) {
 
   ibv_mr *mr = NULL;
-  mr = ibv_reg_mr(ctx->pd, (void *)mm, mmSize,
-                  IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_READ |
-                      IBV_ACCESS_REMOTE_WRITE | IBV_ACCESS_REMOTE_ATOMIC);
+
+  uint32_t record_rkey;
+  uint32_t record_lkey;
+
+//    if (mmSize <= 1024*1024*1024){
+//        mr = ibv_reg_mr(ctx->pd, (void *)mm, mmSize,
+//                        IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_READ |
+//                        IBV_ACCESS_REMOTE_WRITE | IBV_ACCESS_REMOTE_ATOMIC);
+//    }
+    uint64_t time_of_register = mmSize%1024*1024*1024;
+    for (int i = 0; i < time_of_register; ++i) {
+
+        mr = ibv_reg_mr(ctx->pd, (void *)(mm+i*1024*1024*1024), 1024*1024*1024,
+                        IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_READ |
+                        IBV_ACCESS_REMOTE_WRITE | IBV_ACCESS_REMOTE_ATOMIC);
+        if (i !=0){
+            if (record_lkey!= mr->lkey || record_rkey != mr->rkey){
+                printf("rkey and lkey are different\n");
+            }
+        }
+        record_rkey = mr->rkey;
+        record_lkey = mr->lkey;
+    }
+    assert(mmSize - time_of_register*1024*1024*1024 >0);
+    mr = ibv_reg_mr(ctx->pd, (void *)(mm+time_of_register*1024*1024*1024), mmSize - time_of_register*1024*1024*1024,
+                    IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_READ |
+                    IBV_ACCESS_REMOTE_WRITE | IBV_ACCESS_REMOTE_ATOMIC);
+
+
 
   if (!mr) {
     Debug::notifyError("Memory registration failed");
   }
+  mr->addr = (void*)mm;
 
   return mr;
 }
