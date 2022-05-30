@@ -146,7 +146,7 @@ ibv_mr *createMemoryRegion(uint64_t mm, uint64_t mmSize, RdmaContext *ctx) {
 //                        IBV_ACCESS_REMOTE_WRITE | IBV_ACCESS_REMOTE_ATOMIC);
 //    }
     uint64_t time_of_register = mmSize%1024*1024*1024;
-    for (int i = 0; i < time_of_register; ++i) {
+    for (uint64_t i = 0; i < time_of_register; ++i) {
 
         mr = ibv_reg_mr(ctx->pd, (void *)(mm+i*1024*1024*1024), 1024*1024*1024,
                         IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_READ |
