@@ -137,32 +137,32 @@ ibv_mr *createMemoryRegion(uint64_t mm, uint64_t mmSize, RdmaContext *ctx) {
 
   ibv_mr *mr = NULL;
 
-  uint32_t record_rkey;
-  uint32_t record_lkey;
+//  uint32_t record_rkey;
+//  uint32_t record_lkey;
 
 //    if (mmSize <= 1024*1024*1024){
-//        mr = ibv_reg_mr(ctx->pd, (void *)mm, mmSize,
-//                        IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_READ |
-//                        IBV_ACCESS_REMOTE_WRITE | IBV_ACCESS_REMOTE_ATOMIC);
-//    }
-    uint64_t time_of_register = mmSize%1024*1024*1024;
-    for (uint64_t i = 0; i < time_of_register; ++i) {
-
-        mr = ibv_reg_mr(ctx->pd, (void *)(mm+i*1024*1024*1024), 1024*1024*1024,
+        mr = ibv_reg_mr(ctx->pd, (void *)mm, mmSize,
                         IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_READ |
                         IBV_ACCESS_REMOTE_WRITE | IBV_ACCESS_REMOTE_ATOMIC);
-        if (i !=0){
-            if (record_lkey!= mr->lkey || record_rkey != mr->rkey){
-                printf("rkey and lkey are different\n");
-            }
-        }
-        record_rkey = mr->rkey;
-        record_lkey = mr->lkey;
-    }
-    assert(mmSize - time_of_register*1024*1024*1024 >0);
-    mr = ibv_reg_mr(ctx->pd, (void *)(mm+time_of_register*1024*1024*1024), mmSize - time_of_register*1024*1024*1024,
-                    IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_READ |
-                    IBV_ACCESS_REMOTE_WRITE | IBV_ACCESS_REMOTE_ATOMIC);
+//    }
+//    uint64_t time_of_register = mmSize%1024*1024*1024;
+//    for (uint64_t i = 0; i < time_of_register; ++i) {
+//
+//        mr = ibv_reg_mr(ctx->pd, (void *)(mm+i*1024*1024*1024), 1024*1024*1024,
+//                        IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_READ |
+//                        IBV_ACCESS_REMOTE_WRITE | IBV_ACCESS_REMOTE_ATOMIC);
+//        if (i !=0){
+//            if (record_lkey!= mr->lkey || record_rkey != mr->rkey){
+//                printf("rkey and lkey are different\n");
+//            }
+//        }
+//        record_rkey = mr->rkey;
+//        record_lkey = mr->lkey;
+//    }
+//    assert(mmSize - time_of_register*1024*1024*1024 >0);
+//    mr = ibv_reg_mr(ctx->pd, (void *)(mm+time_of_register*1024*1024*1024), mmSize - time_of_register*1024*1024*1024,
+//                    IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_READ |
+//                    IBV_ACCESS_REMOTE_WRITE | IBV_ACCESS_REMOTE_ATOMIC);
 
 
 
