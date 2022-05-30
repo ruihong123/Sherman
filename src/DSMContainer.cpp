@@ -60,7 +60,7 @@ void DSMContainer::serverEnter() {
     uint64_t serverNum;
 
     while (true) {
-        rc = memcached_increment(memc, COMPUTE_NUM_KEY, strlen(COMPUTE_NUM_KEY), 1,
+        rc = memcached_increment(memc, MEMORY_NUM_KEY, strlen(MEMORY_NUM_KEY), 1,
                                  &serverNum);
         if (rc == MEMCACHED_SUCCESS) {
 
