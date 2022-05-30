@@ -9,6 +9,7 @@
 #include "DirectoryConnection.h"
 #include "Connection.h"
 #include "Keeper.h"
+#include "Directory.h"
 
 struct ThreadConnection;
 struct DirectoryConnection;
@@ -29,6 +30,7 @@ private:
     ExchangeMeta localMeta;
 
     std::vector<std::string> serverList;
+    Directory *dirAgent[NR_DIRECTORY];
 
     std::string setKey(uint16_t remoteID) {
         return std::to_string(getMyNodeID()) + "M" + "-" + std::to_string(remoteID) + "C";
@@ -71,6 +73,10 @@ public:
             dirCon[i] =
                     new DirectoryConnection(i, (void *)baseAddr, conf.dsmSize * define::GB,
                                             conf.MemoryNodeNum, remoteCon);
+        }
+        for (int i = 0; i < NR_DIRECTORY; ++i) {
+            dirAgent[i] =
+            new Directory(dirCon[i], remoteCon, conf.MemoryNodeNum, i, myNodeID);
         }
         initLocalMeta();
 
