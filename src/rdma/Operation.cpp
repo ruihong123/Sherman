@@ -81,6 +81,7 @@ static inline void fillSgeWr(ibv_sge &sg, ibv_recv_wr &wr, uint64_t source,
 //  wr.num_sge = 1;
 //}
 
+
 // for UD and DC
 bool rdmaSend(ibv_qp *qp, uint64_t source, uint64_t size, uint32_t lkey,
               ibv_ah *ah, uint32_t remoteQPN /* remote dct_number */,
@@ -93,7 +94,7 @@ bool rdmaSend(ibv_qp *qp, uint64_t source, uint64_t size, uint32_t lkey,
   fillSgeWr(sg, wr, source, size, lkey);
 
   wr.opcode = IBV_WR_SEND;
-
+  // ah contains remote lid and gid
   wr.wr.ud.ah = ah;
   wr.wr.ud.remote_qpn = remoteQPN;
   wr.wr.ud.remote_qkey = UD_PKEY;
