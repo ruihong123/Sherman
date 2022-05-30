@@ -13,3 +13,5 @@ port=$(awk 'NR==2{print}' ../memcached.conf)
 # init 
 echo -e "set ComputeNum 0 0 1\r\n0\r\nquit\r" | nc ${addr} ${port}
 echo -e "set MemoryNum 0 0 1\r\n0\r\nquit\r" | nc ${addr} ${port}
+echo -e "delete 0M-0C\r\n" | nc ${addr} ${port}
+echo -e "delete 0C-0M\r\n" | nc ${addr} ${port}
