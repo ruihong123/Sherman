@@ -106,7 +106,8 @@ private:
                           int page_size, uint64_t *cas_buffer,
                           GlobalAddress lock_addr, uint64_t tag,
                           CoroContext *cxt, int coro_id);
-
+    //Node ID in GLobalAddress for a tree pointer should be the id in the Memory pool
+    // THis funciton will get the page and check the consistency if not, then reread it
   bool page_search(GlobalAddress page_addr, const Key &k, SearchResult &result,
                    CoroContext *cxt, int coro_id, bool from_cache = false);
   void internal_page_search(InternalPage *page, const Key &k,

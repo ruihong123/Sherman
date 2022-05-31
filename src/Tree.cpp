@@ -622,7 +622,8 @@ next:
 
   leaf_page_del(p, k, 0, cxt, coro_id);
 }
-//Node ID for a tree pointer should be the id in the Memory pool
+//Node ID in GLobalAddress for a tree pointer should be the id in the Memory pool
+// THis funciton will get the page and check the consistency if not, then reread it
 bool Tree::page_search(GlobalAddress page_addr, const Key &k,
                        SearchResult &result, CoroContext *cxt, int coro_id,
                        bool from_cache) {
