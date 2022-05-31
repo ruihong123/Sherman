@@ -171,6 +171,7 @@ void thread_run(int id) {
     tree->lock_bench(key);
 #else
     if (rand_r(&seed) % 100 < kReadRatio) { // GET
+        printf("Get one key");
       tree->search(key, v);
     } else {
       v = 12;
