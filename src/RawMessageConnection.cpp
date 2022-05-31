@@ -11,13 +11,13 @@ void RawMessageConnection::initSend() {}
 void RawMessageConnection::sendRawMessage(RawMessage *m, uint32_t remoteQPN,
                                           ibv_ah *ah) {
 
-
+  if ((sendCounter & SIGNAL_BATCH) == 0 && sendCounter > 0) {
+    ibv_wc wc;
+    pollWithCQ(send_cq, 1, &wc);
+  }
 
   rdmaSend(message, (uint64_t)m - sendPadding, sizeof(RawMessage) + sendPadding,
            messageLkey, ah, remoteQPN, (sendCounter & SIGNAL_BATCH) == 0);
-    if ((sendCounter & SIGNAL_BATCH) == 0 ) {
-        ibv_wc wc;
-        pollWithCQ(send_cq, 1, &wc);
-    }
+
   ++sendCounter;
 }
