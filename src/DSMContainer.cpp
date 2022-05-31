@@ -32,7 +32,7 @@ void DSMContainer::initLocalMeta() {
     localMeta.dsmBase = (uint64_t)dirCon[0]->dsmPool;
     localMeta.lockBase = (uint64_t)dirCon[0]->lockPool;
 //    localMeta.cacheBase = (uint64_t)thCon[0]->cachePool;
-
+    localMeta.node_type = Memory;
 //    // per thread APP
 //    for (int i = 0; i < MAX_APP_THREAD; ++i) {
 //        localMeta.appTh[i].lid = thCon[i]->ctx.lid;
