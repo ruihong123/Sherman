@@ -402,7 +402,7 @@ void Tree::insert(const Key &k, const Value &v, CoroContext *cxt, int coro_id) {
       if (leaf_page_store(cache_addr, k, v, root, 0, cxt, coro_id, true)) {
 
         cache_hit[dsm->getMyThreadID()][0]++;
-
+          printf("Cache hit\n");
         if (res == HotResult::SUCC) {
           hot_buf.clear(k);
         }
@@ -411,6 +411,7 @@ void Tree::insert(const Key &k, const Value &v, CoroContext *cxt, int coro_id) {
       }
       // cache stale, from root,
       index_cache->invalidate(entry);
+        printf("Invalidate cache\n");
     }
     cache_miss[dsm->getMyThreadID()][0]++;
   }
@@ -677,7 +678,7 @@ re_read:
 
     if (result.level == 1 && enable_cache) {
         // add the pointer of this internal page into cache. Why it make sense?
-
+        printf("Add content to cache\n");
       index_cache->add_to_cache(page);
       // if (enter_debug) {
       //   printf("add %lud [%lud %lud]\n", k, page->hdr.lowest,
