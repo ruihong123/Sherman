@@ -267,7 +267,7 @@ int main(int argc, char *argv[]) {
 #ifndef BENCH_LOCK
   if (dsm->getMyNodeID() == 0) {
     for (uint64_t i = 1; i < 1024000; ++i) {
-        printf("insert key %d", i);
+//        printf("insert key %d", i);
       tree->insert(to_key(i), i * 2);
     }
   }
