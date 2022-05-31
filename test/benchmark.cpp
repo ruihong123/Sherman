@@ -109,6 +109,9 @@ void thread_run(int id) {
     if (i % all_thread == my_id) {
       tree->insert(to_key(i), i * 2);
     }
+      if (i % 1000 == 0 ){
+          printf("warm up number: %lu\r", i);
+      }
   }
 
   warmup_cnt.fetch_add(1);
@@ -148,6 +151,7 @@ void thread_run(int id) {
 
   Timer timer;
   Value *value_buffer = (Value *)malloc(sizeof(Value) * 1024 * 1024);
+  int print_counter = 0;
   while (true) {
 
     if (need_stop || id >= kTthreadUpper) {
@@ -170,12 +174,21 @@ void thread_run(int id) {
     }
     tree->lock_bench(key);
 #else
+
     if (rand_r(&seed) % 100 < kReadRatio) { // GET
 //        printf("Get one key");
       tree->search(key, v);
+
     } else {
       v = 12;
       tree->insert(key, v);
+
+
+    }
+    print_counter++;
+    if (print_counter%1000 == 0)
+    {
+        printf("%d key-value pairs hase been inserted\r", print_counter);
     }
 #endif
     auto us_10 = timer.end() / 100;
