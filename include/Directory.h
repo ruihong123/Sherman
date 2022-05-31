@@ -22,7 +22,7 @@ private:
   DirectoryConnection *dCon;
   RemoteConnection *remoteInfo;
 
-  uint32_t machineNR;
+  uint32_t ComputeMachineNR;
   uint16_t dirID;
   uint16_t nodeID;
 

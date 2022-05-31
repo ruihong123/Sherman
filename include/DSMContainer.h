@@ -72,7 +72,7 @@ public:
             // in this machine.
             dirCon[i] =
                     new DirectoryConnection(i, (void *)baseAddr, conf.dsmSize * define::GB,
-                                            conf.MemoryNodeNum, remoteCon);
+                                            conf.ComputeNodeNum, remoteCon);
         }
         for (int i = 0; i < NR_DIRECTORY; ++i) {
             dirAgent[i] =

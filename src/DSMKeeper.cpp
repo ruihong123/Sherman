@@ -20,7 +20,14 @@ void DSMKeeper::initLocalMeta_Compute() {
            16 * sizeof(uint8_t));
 
     localMeta.appUdQpn[i] = thCon[i]->message->getQPN();
+      uint8_t* p = localMeta.appTh[i].gid;
+      fprintf(stdout,
+              "Remote GID =%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x\n ",
+              p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9], p[10],
+              p[11], p[12], p[13], p[14], p[15]);
+      printf("Put lid : 0x%x, qpn : 0x%x\n", localMeta.appTh[i].lid, localMeta.appUdQpn[i]);
   }
+
 
   // per thread DIR
 //  for (int i = 0; i < NR_DIRECTORY; ++i) {
@@ -154,7 +161,12 @@ void DSMKeeper::setDataFromRemote(uint16_t remoteID, ExchangeMeta *remoteMeta) {
     info.dsmRKey[i] = remoteMeta->dirTh[i].rKey;
     info.lockRKey[i] = remoteMeta->dirTh[i].lock_rkey;
     info.dirMessageQPN[i] = remoteMeta->dirUdQpn[i];
-
+    uint8_t* p = remoteMeta->dirTh[i].gid;
+    fprintf(stdout,
+              "Remote GID =%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x\n ",
+              p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9], p[10],
+              p[11], p[12], p[13], p[14], p[15]);
+    printf("Received lid : 0x%x, qpn : 0x%x\n", remoteMeta->dirTh[i].lid, info.dirMessageQPN[i]);
     for (int k = 0; k < MAX_APP_THREAD; ++k) {
       struct ibv_ah_attr ahAttr;
       fillAhAttr(&ahAttr, remoteMeta->dirTh[i].lid, remoteMeta->dirTh[i].gid,

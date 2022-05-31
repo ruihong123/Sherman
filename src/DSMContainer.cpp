@@ -52,7 +52,14 @@ void DSMContainer::initLocalMeta() {
                16 * sizeof(uint8_t));
 
         localMeta.dirUdQpn[i] = dirCon[i]->message->getQPN();
+        uint8_t* p = localMeta.dirTh[i].gid;
+        fprintf(stdout,
+                "Remote GID =%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x\n ",
+                p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9], p[10],
+                p[11], p[12], p[13], p[14], p[15]);
+        printf("Put lid : 0x%x, qpn : 0x%x\n", localMeta.dirTh[i].lid, localMeta.dirUdQpn[i]);
     }
+
 
 }
 void DSMContainer::serverEnter() {
@@ -190,6 +197,12 @@ void DSMContainer::setDataFromRemote(uint16_t remoteID, ExchangeMeta *remoteMeta
     for (int i = 0; i < MAX_APP_THREAD; ++i) {
         info.appRKey[i] = remoteMeta->appTh[i].rKey;
         info.appMessageQPN[i] = remoteMeta->appUdQpn[i];
+        uint8_t* p = remoteMeta->appTh[i].gid;
+        fprintf(stdout,
+                "Remote GID =%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x\n ",
+                p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9], p[10],
+                p[11], p[12], p[13], p[14], p[15]);
+        printf("Received lid : 0x%x, qpn : 0x%x\n", remoteMeta->appTh[i].lid, info.appMessageQPN[i]);
 
         for (int k = 0; k < NR_DIRECTORY; ++k) {
             struct ibv_ah_attr ahAttr;

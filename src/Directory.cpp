@@ -11,7 +11,7 @@ bool enable_cache;
 
 Directory::Directory(DirectoryConnection *dCon, RemoteConnection *remoteInfo,
                      uint32_t machineNR, uint16_t dirID, uint16_t nodeID)
-    : dCon(dCon), remoteInfo(remoteInfo), machineNR(machineNR), dirID(dirID),
+    : dCon(dCon), remoteInfo(remoteInfo), ComputeMachineNR(machineNR), dirID(dirID),
       nodeID(nodeID), dirTh(nullptr) {
 
   { // chunck alloctor
