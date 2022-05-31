@@ -108,13 +108,21 @@ static inline unsigned long long asm_rdtsc(void) {
   __asm__ __volatile__("rdtsc" : "=a"(lo), "=d"(hi));
   return ((unsigned long long)lo) | (((unsigned long long)hi) << 32);
 }
-
+struct Key_buff {
+    char buffer[20];
+};
+struct Value_buff {
+    char buffer[400];
+};
 // For Tree
 using Key = uint64_t;
 using Value = uint64_t;
+//using Key = Key_buff;
+//using Value = Value_buff;
 constexpr Key kKeyMin = std::numeric_limits<Key>::min();
 constexpr Key kKeyMax = std::numeric_limits<Key>::max();
-constexpr Value kValueNull = 0;
+//constexpr Value kValueNull = 0;
+constexpr Value kValueNull = {};
 constexpr uint32_t kInternalPageSize = 1024;
 constexpr uint32_t kLeafPageSize = 1024;
 

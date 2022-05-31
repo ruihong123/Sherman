@@ -155,8 +155,8 @@ public:
     std::cout << "leftmost=" << leftmost_ptr << ", "
               << "sibling=" << sibling_ptr << ", "
               << "level=" << (int)level << ","
-              << "cnt=" << last_index + 1 << ","
-              << "range=[" << lowest << " - " << highest << "]";
+              << "cnt=" << last_index + 1 << ",";
+//              << "range=[" << lowest << " - " << highest << "]";
   }
 } __attribute__((packed));
 ;
@@ -168,7 +168,8 @@ public:
 
   InternalEntry() {
     ptr = GlobalAddress::Null();
-    key = 0;
+//    key = 0;
+      key = {};
   }
 } __attribute__((packed));
 
@@ -183,7 +184,8 @@ public:
     f_version = 0;
     r_version = 0;
     value = kValueNull;
-    key = 0;
+//    key = 0;
+      key = {};
   }
 } __attribute__((packed));
 
