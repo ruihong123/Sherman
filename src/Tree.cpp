@@ -135,6 +135,9 @@ void Tree::broadcast_new_root(GlobalAddress new_root_addr, int root_level) {
   m.type = RpcType::NEW_ROOT;
   m.addr = new_root_addr;
   m.level = root_level;
+  if (root_level >= 1) {
+        enable_cache = true;
+  }
   for (int i = 0; i < dsm->getClusterSize(); ++i) {
     dsm->rpc_call_dir(m, i);
   }
@@ -378,18 +381,18 @@ void Tree::insert(const Key &k, const Value &v, CoroContext *cxt, int coro_id) {
 
   before_operation(cxt, coro_id);
 
-  auto res = hot_buf.set(k);
-
-  if (res == HotResult::OCCUPIED) {
-    hot_filter_count[dsm->getMyThreadID()][0]++;
-    if (cxt == nullptr) {
-      while (!hot_buf.wait(k))
-        ;
-    } else {
-      hot_wait_queue.push(coro_id);
-      (*cxt->yield)(*cxt->master);
-    }
-  }
+//  auto res = hot_buf.set(k);
+//
+//  if (res == HotResult::OCCUPIED) {
+//    hot_filter_count[dsm->getMyThreadID()][0]++;
+//    if (cxt == nullptr) {
+//      while (!hot_buf.wait(k))
+//        ;
+//    } else {
+//      hot_wait_queue.push(coro_id);
+//      (*cxt->yield)(*cxt->master);
+//    }
+//  }
 
   if (enable_cache) {
     GlobalAddress cache_addr;
@@ -403,9 +406,9 @@ void Tree::insert(const Key &k, const Value &v, CoroContext *cxt, int coro_id) {
 
         cache_hit[dsm->getMyThreadID()][0]++;
           printf("Cache hit\n");
-        if (res == HotResult::SUCC) {
-          hot_buf.clear(k);
-        }
+//        if (res == HotResult::SUCC) {
+//          hot_buf.clear(k);
+//        }
         //Why we can return here?
         return;
       }
@@ -446,9 +449,9 @@ next:
 
   leaf_page_store(p, k, v, root, 0, cxt, coro_id);
 
-  if (res == HotResult::SUCC) {
-    hot_buf.clear(k);
-  }
+//  if (res == HotResult::SUCC) {
+//    hot_buf.clear(k);
+//  }
 }
 
 bool Tree::search(const Key &k, Value &v, CoroContext *cxt, int coro_id) {
