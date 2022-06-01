@@ -186,13 +186,13 @@ void thread_run(int id) {
 
     }
     print_counter++;
-    if (print_counter%1000 == 0)
+    if (print_counter%10000 == 0)
     {
         printf("%d key-value pairs hase been inserted\r", print_counter);
     }
-      if (print_counter%10000 == 0)
+      if (print_counter%100000 == 0)
       {
-          printf("the generated distributed key is %d\n", print_counter);
+          printf("the generated distributed key is %d\n", dis);
       }
 #endif
     auto us_10 = timer.end() / 100;
