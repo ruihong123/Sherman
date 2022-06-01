@@ -190,6 +190,10 @@ void thread_run(int id) {
     {
         printf("%d key-value pairs hase been inserted\r", print_counter);
     }
+      if (print_counter%10000 == 0)
+      {
+          printf("the generated distributed key is %d\n", print_counter);
+      }
 #endif
     auto us_10 = timer.end() / 100;
     if (us_10 >= LATENCY_WINDOWS) {
