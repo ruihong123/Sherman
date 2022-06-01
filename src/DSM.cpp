@@ -50,7 +50,7 @@ DSM::DSM(const DSMConfig &conf)
 
 //  for (int i = 0; i < NR_DIRECTORY; ++i) {
 //    dirAgent[i] =
-//        new Directory(dirCon[i], remoteInfo, conf.MemoryNodeNum, i, myNodeID);
+//        new Directory(dirCon_[i], remoteInfo, conf.MemoryNodeNum, i, myNodeID);
 //  }
 
   keeper->barrier("DSM-init");
@@ -95,7 +95,7 @@ void DSM::initRDMAConnection_Compute() {
 //  for (int i = 0; i < NR_DIRECTORY; ++i) {
 //      // the connection below just create the queue pair for DSM. also initialize the DSM memory region
 //      // in this machine.
-//    dirCon[i] =
+//    dirCon_[i] =
 //        new DirectoryConnection(i, (void *)baseAddr, conf.dsmSize * define::GB,
 //                                conf.MemoryNodeNum, remoteInfo);
 //  }

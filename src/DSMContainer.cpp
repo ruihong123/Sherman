@@ -17,41 +17,41 @@ const char *DSMContainer::ServerPrefix = "SPre";
 //    for (int i = 0; i < NR_DIRECTORY; ++i) {
 //        // the connection below just create the queue pair for DSM. also initialize the DSM memory region
 //        // in this machine.
-//        dirCon[i] =
+//        dirCon_[i] =
 //                new DirectoryConnection(i, (void *)baseAddr, conf.dsmSize * define::GB,
 //                                        conf.MemoryNodeNum, remoteInfo);
 //    }
 //    // THe DSM keeper will set up the queue pair connection
-////    keeper = new DSMKeeper(thCon, dirCon, remoteInfo, conf.MemoryNodeNum);
+////    keeper = new DSMKeeper(thCon_, dirCon_, remoteInfo, conf.MemoryNodeNum);
 //
 ////    myNodeID = keeper->getMyNodeID();
 //}
 //TODO: seperate into initLocalMeta_memroy and initLocalMeta_compute
 void DSMContainer::initLocalMeta() {
     //What is the difference between dsmPool and dsmMR Answer dsmPool is the pointer of dsmMR
-    localMeta.dsmBase = (uint64_t)dirCon[0]->dsmPool;
-    localMeta.lockBase = (uint64_t)dirCon[0]->lockPool;
-//    localMeta.cacheBase = (uint64_t)thCon[0]->cachePool;
+    localMeta.dsmBase = (uint64_t)dirCon_[0]->dsmPool;
+    localMeta.lockBase = (uint64_t)dirCon_[0]->lockPool;
+//    localMeta.cacheBase = (uint64_t)thCon_[0]->cachePool;
     localMeta.node_type = Memory;
 //    // per thread APP
 //    for (int i = 0; i < MAX_APP_THREAD; ++i) {
-//        localMeta.appTh[i].lid = thCon[i]->ctx.lid;
-//        localMeta.appTh[i].rKey = thCon[i]->cacheMR->rkey;
-//        memcpy((char *)localMeta.appTh[i].gid, (char *)(&thCon[i]->ctx.gid),
+//        localMeta.appTh[i].lid = thCon_[i]->ctx.lid;
+//        localMeta.appTh[i].rKey = thCon_[i]->cacheMR->rkey;
+//        memcpy((char *)localMeta.appTh[i].gid, (char *)(&thCon_[i]->ctx.gid),
 //               16 * sizeof(uint8_t));
 //
-//        localMeta.appUdQpn[i] = thCon[i]->message->getQPN();
+//        localMeta.appUdQpn[i] = thCon_[i]->message->getQPN();
 //    }
 
     // per thread DIR
     for (int i = 0; i < NR_DIRECTORY; ++i) {
-        localMeta.dirTh[i].lid = dirCon[i]->ctx.lid;
-        localMeta.dirTh[i].rKey = dirCon[i]->dsmMR->rkey;
-        localMeta.dirTh[i].lock_rkey = dirCon[i]->lockMR->rkey;
-        memcpy((char *)localMeta.dirTh[i].gid, (char *)(&dirCon[i]->ctx.gid),
+        localMeta.dirTh[i].lid = dirCon_[i]->ctx.lid;
+        localMeta.dirTh[i].rKey = dirCon_[i]->dsmMR->rkey;
+        localMeta.dirTh[i].lock_rkey = dirCon_[i]->lockMR->rkey;
+        memcpy((char *)localMeta.dirTh[i].gid, (char *)(&dirCon_[i]->ctx.gid),
                16 * sizeof(uint8_t));
 
-        localMeta.dirUdQpn[i] = dirCon[i]->message->getQPN();
+        localMeta.dirUdQpn[i] = dirCon_[i]->message->getQPN();
         uint8_t* p = localMeta.dirTh[i].gid;
         fprintf(stdout,
                 "Remote GID =%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x\n ",
@@ -127,7 +127,7 @@ bool DSMContainer::connectNode(uint16_t remoteID) {
 
 void DSMContainer::setDataToRemote(uint16_t remoteID) {
     for (int i = 0; i < NR_DIRECTORY; ++i) {
-        auto &c = dirCon[i];
+        auto &c = dirCon_[i];
 
         for (int k = 0; k < MAX_APP_THREAD; ++k) {
             localMeta.dirRcQpn2app[i][k] = c->data2app[k][remoteID]->qp_num;
@@ -135,7 +135,7 @@ void DSMContainer::setDataToRemote(uint16_t remoteID) {
     }
 
 //    for (int i = 0; i < MAX_APP_THREAD; ++i) {
-//        auto &c = thCon[i];
+//        auto &c = thCon_[i];
 //        for (int k = 0; k < NR_DIRECTORY; ++k) {
 //            localMeta.appRcQpn2dir[i][k] = c->data[k][remoteID]->qp_num;
 //        }
@@ -145,7 +145,7 @@ void DSMContainer::setDataToRemote(uint16_t remoteID) {
 
 void DSMContainer::setDataFromRemote(uint16_t remoteID, ExchangeMeta *remoteMeta) {
     for (int i = 0; i < NR_DIRECTORY; ++i) {
-        auto &c = dirCon[i];
+        auto &c = dirCon_[i];
 
         for (int k = 0; k < MAX_APP_THREAD; ++k) {
             auto &qp = c->data2app[k][remoteID];
@@ -160,7 +160,7 @@ void DSMContainer::setDataFromRemote(uint16_t remoteID, ExchangeMeta *remoteMeta
     }
 
 //    for (int i = 0; i < MAX_APP_THREAD; ++i) {
-//        auto &c = thCon[i];
+//        auto &c = thCon_[i];
 //        for (int k = 0; k < NR_DIRECTORY; ++k) {
 //            auto &qp = c->data[k][remoteID];
 //
@@ -186,8 +186,8 @@ void DSMContainer::setDataFromRemote(uint16_t remoteID, ExchangeMeta *remoteMeta
 //        for (int k = 0; k < MAX_APP_THREAD; ++k) {
 //            struct ibv_ah_attr ahAttr;
 //            fillAhAttr(&ahAttr, remoteMeta->dirTh[i].lid, remoteMeta->dirTh[i].gid,
-//                       &thCon[k]->ctx);
-//            info.appToDirAh[k][i] = ibv_create_ah(thCon[k]->ctx.pd, &ahAttr);
+//                       &thCon_[k]->ctx);
+//            info.appToDirAh[k][i] = ibv_create_ah(thCon_[k]->ctx.pd, &ahAttr);
 //
 //            assert(info.appToDirAh[k][i]);
 //        }
@@ -207,8 +207,8 @@ void DSMContainer::setDataFromRemote(uint16_t remoteID, ExchangeMeta *remoteMeta
         for (int k = 0; k < NR_DIRECTORY; ++k) {
             struct ibv_ah_attr ahAttr;
             fillAhAttr(&ahAttr, remoteMeta->appTh[i].lid, remoteMeta->appTh[i].gid,
-                       &dirCon[k]->ctx);
-            info.dirToAppAh[k][i] = ibv_create_ah(dirCon[k]->ctx.pd, &ahAttr);
+                       &dirCon_[k]->ctx);
+            info.dirToAppAh[k][i] = ibv_create_ah(dirCon_[k]->ctx.pd, &ahAttr);
 
             assert(info.dirToAppAh[k][i]);
         }

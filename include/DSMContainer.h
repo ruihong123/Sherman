@@ -23,12 +23,12 @@ private:
     static const char *OK;
     static const char *ServerPrefix;
     uint64_t baseAddr;
-    ThreadConnection **thCon;
-    DirectoryConnection **dirCon;
+    ThreadConnection **thCon_;
+    DirectoryConnection **dirCon_;
     RemoteConnection *remoteCon;
 //    RemoteConnection *remoteInfo;
     ExchangeMeta localMeta;
-
+    DSMConfig* config_inner;
     std::vector<std::string> serverList;
     Directory *dirAgent[NR_DIRECTORY];
 
@@ -54,7 +54,7 @@ protected:
 public:
     DSMContainer(ThreadConnection **thCon, DirectoryConnection **dirCon, const DSMConfig &conf,
                  uint32_t ComputeMaxServer = 12, uint32_t MemoryMaxServer = 12)
-    : Keeper(ComputeMaxServer, MemoryMaxServer), thCon(thCon), dirCon(dirCon) {
+    : Keeper(ComputeMaxServer, MemoryMaxServer), thCon_(thCon), dirCon_(dirCon) {
 
         remoteCon = new RemoteConnection[conf.ComputeNodeNum];
 
@@ -70,7 +70,7 @@ public:
         for (int i = 0; i < NR_DIRECTORY; ++i) {
             // the connection below just create the queue pair for DSM. also initialize the DSM memory region
             // in this machine.
-            dirCon[i] =
+            dirCon_[i] =
                     new DirectoryConnection(i, (void *)baseAddr, conf.dsmSize * define::GB,
                                             conf.ComputeNodeNum, remoteCon);
         }
@@ -86,7 +86,10 @@ public:
     }
     void initialization(){
         serverEnter();
-
+        for (int i = 0; i < NR_DIRECTORY; ++i) {
+            dirAgent[i] =
+                    new Directory(dirCon_[i], remoteCon, MemorymaxServer, i, myNodeID);
+        }
         serverConnect();
 //        connectMySelf();
 
