@@ -66,7 +66,7 @@ void DSMKeeper::serverConnect() {
     uint32_t flags;
     memcached_return rc;
 
-    while (curServer < ComputemaxServer) {
+    while (curServer < MemorymaxServer) {
         char *serverNumStr = memcached_get(memc, MEMORY_NUM_KEY,
                                            strlen(MEMORY_NUM_KEY), &l, &flags, &rc);
         if (rc != MEMCACHED_SUCCESS) {
