@@ -138,6 +138,8 @@ void Tree::broadcast_new_root(GlobalAddress new_root_addr, int root_level) {
   if (root_level >= 1) {
         enable_cache = true;
   }
+  //TODO: When we seperate the compute from the memory, how can we broad cast the new root
+  // or can we wait until the compute node detect an inconsistent.
   for (int i = 0; i < dsm->getClusterSize(); ++i) {
     dsm->rpc_call_dir(m, i);
   }
