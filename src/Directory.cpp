@@ -10,8 +10,8 @@ int g_root_level = -1;
 bool enable_cache ;
 
 Directory::Directory(DirectoryConnection *dCon, RemoteConnection *remoteInfo,
-                     uint32_t machineNR, uint16_t dirID, uint16_t nodeID)
-    : dCon(dCon), remoteInfo(remoteInfo), ComputeMachineNR(machineNR), dirID(dirID),
+                     uint32_t ComputemachineNR, uint16_t dirID, uint16_t nodeID)
+    : dCon(dCon), remoteInfo(remoteInfo), ComputeMachineNR(ComputemachineNR), dirID(dirID),
       nodeID(nodeID), dirTh(nullptr) {
 
   { // chunck alloctor

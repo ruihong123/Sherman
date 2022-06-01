@@ -14,7 +14,7 @@
 class Directory {
 public:
   Directory(DirectoryConnection *dCon, RemoteConnection *remoteInfo,
-            uint32_t machineNR, uint16_t dirID, uint16_t nodeID);
+            uint32_t ComputemachineNR, uint16_t dirID, uint16_t nodeID);
 
   ~Directory();
 

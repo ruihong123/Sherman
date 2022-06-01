@@ -74,10 +74,10 @@ public:
                     new DirectoryConnection(i, (void *)baseAddr, conf.dsmSize * define::GB,
                                             conf.ComputeNodeNum, remoteCon);
         }
-        for (int i = 0; i < NR_DIRECTORY; ++i) {
-            dirAgent[i] =
-            new Directory(dirCon[i], remoteCon, conf.MemoryNodeNum, i, myNodeID);
-        }
+//        for (int i = 0; i < NR_DIRECTORY; ++i) {
+//            dirAgent[i] =
+//            new Directory(dirCon[i], remoteCon, conf.ComputeNodeNum, i, myNodeID);
+//        }
         initLocalMeta();
 
         if (!connectMemcached()) {
