@@ -87,7 +87,7 @@ void DSMContainer::serverConnect() {
     uint32_t flags;
     memcached_return rc;
 
-    while (curServer < maxServer) {
+    while (curServer < ComputemaxServer) {
         char *serverNumStr = memcached_get(memc, COMPUTE_NUM_KEY,
                                            strlen(COMPUTE_NUM_KEY), &l, &flags, &rc);
         if (rc != MEMCACHED_SUCCESS) {
@@ -236,7 +236,7 @@ void DSMContainer::barrier(const std::string &barrierKey) {
     memFetchAndAdd(key.c_str(), key.size());
     while (true) {
         uint64_t v = std::stoull(memGet(key.c_str(), key.size()));
-        if (v == this->getServerNR()) {
+        if (v == this->getComputeServerNR()) {
             return;
         }
     }
@@ -249,7 +249,7 @@ uint64_t DSMContainer::sum(const std::string &sum_key, uint64_t value) {
     memSet(key.c_str(), key.size(), (char *)&value, sizeof(value));
 
     uint64_t ret = 0;
-    for (int i = 0; i < this->getServerNR(); ++i) {
+    for (int i = 0; i < this->getComputeServerNR(); ++i) {
         key = key_prefix + std::to_string(i);
         ret += *(uint64_t *)memGet(key.c_str(), key.size());
     }

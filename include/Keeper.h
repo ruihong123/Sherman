@@ -52,8 +52,8 @@ private:
 protected:
     static const char *COMPUTE_NUM_KEY;
     static const char *MEMORY_NUM_KEY;
-    uint32_t maxServer;
-
+    uint32_t ComputemaxServer;
+    uint32_t MemorymaxServer;
     uint16_t curServer;
     uint16_t myNodeID;
     std::string myIP;
@@ -69,11 +69,11 @@ protected:
 
 
 public:
-  Keeper(uint32_t maxServer = 12);
+  Keeper(uint32_t ComputemaxServer = 12, uint32_t MemorymaxServer = 12);
   ~Keeper();
 
   uint16_t getMyNodeID() const { return this->myNodeID; }
-  uint16_t getServerNR() const { return this->maxServer; }
+  uint16_t getComputeServerNR() const { return this->ComputemaxServer; }
   uint16_t getMyPort() const { return this->myPort; }
 
   std::string getMyIP() const { return this->myIP; }

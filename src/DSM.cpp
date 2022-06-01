@@ -100,7 +100,7 @@ void DSM::initRDMAConnection_Compute() {
 //                                conf.MemoryNodeNum, remoteInfo);
 //  }
   // THe DSM keeper will set up the queue pair connection
-  keeper = new DSMKeeper(thCon, dirCon, remoteInfo, conf.MemoryNodeNum);
+  keeper = new DSMKeeper(thCon, dirCon, remoteInfo, conf.MemoryNodeNum, conf.ComputeNodeNum);
   keeper->initialization();
   myNodeID = keeper->getMyNodeID();
 }

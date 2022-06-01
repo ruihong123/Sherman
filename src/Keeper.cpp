@@ -16,8 +16,8 @@ std::string trim(const std::string &s) {
 
 const char *Keeper::COMPUTE_NUM_KEY = "ComputeNum";
 const char *Keeper::MEMORY_NUM_KEY = "MemoryNum";
-Keeper::Keeper(uint32_t maxServer)
-    : maxServer(maxServer), curServer(0), memc(NULL) {}
+Keeper::Keeper(uint32_t ComputemaxServer, uint32_t MemorymaxServer)
+    : ComputemaxServer(ComputemaxServer), curServer(0), memc(NULL) {}
 
 Keeper::~Keeper() {
   //   listener.detach();

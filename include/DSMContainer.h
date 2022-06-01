@@ -52,9 +52,9 @@ protected:
     virtual void serverConnect() override;
     virtual void serverEnter() override;
 public:
-    DSMContainer(ThreadConnection **thCon, DirectoryConnection **dirCon,
-                 const DSMConfig &conf, uint32_t maxServer = 12)
-    : Keeper(maxServer), thCon(thCon), dirCon(dirCon) {
+    DSMContainer(ThreadConnection **thCon, DirectoryConnection **dirCon, const DSMConfig &conf,
+                 uint32_t ComputeMaxServer = 12, uint32_t MemoryMaxServer = 12)
+    : Keeper(ComputeMaxServer, MemoryMaxServer), thCon(thCon), dirCon(dirCon) {
 
         remoteCon = new RemoteConnection[conf.ComputeNodeNum];
 

@@ -29,7 +29,7 @@ int main(int argc,char* argv[])
     ThreadConnection *thCon[MAX_APP_THREAD];
     DirectoryConnection *dirCon[NR_DIRECTORY];
 //    DSMConfig conf;
-    auto keeper = new DSMContainer(thCon, dirCon, conf, conf.ComputeNodeNum);
+    auto keeper = new DSMContainer(thCon, dirCon, conf, conf.ComputeNodeNum, conf.MemoryNodeNum);
 
     keeper->initialization();
     while(1){}

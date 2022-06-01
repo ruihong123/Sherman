@@ -48,8 +48,8 @@ protected:
   virtual void serverEnter() override;
 public:
   DSMKeeper(ThreadConnection **thCon, DirectoryConnection **dirCon, RemoteConnection *remoteCon,
-            uint32_t maxMemoryServer = 12)
-      : Keeper(maxMemoryServer), thCon(thCon), dirCon(dirCon),
+            uint32_t maxMemoryServer = 12, uint32_t maxComputeServer = 12)
+      : Keeper(maxComputeServer, maxMemoryServer), thCon(thCon), dirCon(dirCon),
         remoteCon(remoteCon) {
 
       initLocalMeta_Compute();
