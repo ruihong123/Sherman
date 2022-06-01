@@ -109,7 +109,7 @@ void thread_run(int id) {
     if (i % all_thread == my_id) {
       tree->insert(to_key(i), i * 2);
     }
-      if (i % 1000 == 0 ){
+      if (i % 1000000 == 0 ){
           printf("warm up number: %lu\r", i);
       }
   }
@@ -158,7 +158,7 @@ void thread_run(int id) {
       while (true)
         ;
     }
-
+    // the dis range is [0, 64M]
     uint64_t dis = mehcached_zipf_next(&state);
 
     uint64_t key = to_key(dis);
@@ -190,10 +190,10 @@ void thread_run(int id) {
     {
         printf("%d key-value pairs hase been inserted\r", print_counter);
     }
-      if (print_counter%100000 == 0)
-      {
-          printf("the generated distributed key is %d\n", dis);
-      }
+//      if (print_counter%100000 == 0)
+//      {
+//          printf("the generated distributed key is %d\n", dis);
+//      }
 #endif
     auto us_10 = timer.end() / 100;
     if (us_10 >= LATENCY_WINDOWS) {
