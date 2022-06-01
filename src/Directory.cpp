@@ -76,7 +76,9 @@ void Directory::process_message(const RawMessage *m) {
     if (g_root_level < m->level) {
       g_root_ptr = m->addr;
       g_root_level = m->level;
-      if (g_root_level >= 1) {
+      // can not set as 1. if set as 1 then the root node will be cached and no page search
+      // will go through it, then it will trigger a bug in function insert internal.
+      if (g_root_level >= 3) {
         enable_cache = true;
       }
     }

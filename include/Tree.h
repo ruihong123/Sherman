@@ -85,12 +85,14 @@ private:
 
   void coro_worker(CoroYield &yield, RequstGen *gen, int coro_id);
   void coro_master(CoroYield &yield, int coro_cnt);
-
+  // broadcast the new root to all other memroy servers, if memory server and compute
+  // servers are the same then the new root is know by all the compute nodes, However,
+  // when we seperate the compute from the memory, the memroy node will not get notified.
   void broadcast_new_root(GlobalAddress new_root_addr, int root_level);
   bool update_new_root(GlobalAddress left, const Key &k, GlobalAddress right,
                        int level, GlobalAddress old_root, CoroContext *cxt,
                        int coro_id);
-
+  // Insert a key and a point at a particular level (level != 0), the node is unknown
   void insert_internal(const Key &k, GlobalAddress v, CoroContext *cxt,
                        int coro_id, int level);
 
@@ -107,16 +109,19 @@ private:
                           GlobalAddress lock_addr, uint64_t tag,
                           CoroContext *cxt, int coro_id);
     //Node ID in GLobalAddress for a tree pointer should be the id in the Memory pool
-    // THis funciton will get the page and check the consistency if not, then reread it
+    // THis funciton will get the page by the page addr and search the pointer for the
+    // next level if it is not leaf page. If it is a leaf page, just put the value in the
+    // result. this funciton = fetch the page + internal page serach + leafpage search + re-read
   bool page_search(GlobalAddress page_addr, const Key &k, SearchResult &result,
                    CoroContext *cxt, int coro_id, bool from_cache = false);
   void internal_page_search(InternalPage *page, const Key &k,
                             SearchResult &result);
   void leaf_page_search(LeafPage *page, const Key &k, SearchResult &result);
-
+    // store a key and a pointer to an known internal node.
   void internal_page_store(GlobalAddress page_addr, const Key &k,
                            GlobalAddress value, GlobalAddress root, int level,
                            CoroContext *cxt, int coro_id);
+  //store a key and value to a leaf page
   bool leaf_page_store(GlobalAddress page_addr, const Key &k, const Value &v,
                        GlobalAddress root, int level, CoroContext *cxt,
                        int coro_id, bool from_cache = false);

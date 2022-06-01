@@ -135,7 +135,7 @@ void Tree::broadcast_new_root(GlobalAddress new_root_addr, int root_level) {
   m.type = RpcType::NEW_ROOT;
   m.addr = new_root_addr;
   m.level = root_level;
-  if (root_level >= 1) {
+  if (root_level >= 3) {
         enable_cache = true;
   }
   //TODO: When we seperate the compute from the memory, how can we broad cast the new root
@@ -347,7 +347,7 @@ void Tree::lock_bench(const Key &k, CoroContext *cxt, int coro_id) {
   try_lock_addr(lock_addr, 1, cas_buffer, cxt, coro_id);
   unlock_addr(lock_addr, 1, cas_buffer, cxt, coro_id, true);
 }
-
+// You need to make sure it is not the root level
 void Tree::insert_internal(const Key &k, GlobalAddress v, CoroContext *cxt,
                            int coro_id, int level) {
   auto root = get_root_ptr(cxt, coro_id);
@@ -404,6 +404,7 @@ void Tree::insert(const Key &k, const Value &v, CoroContext *cxt, int coro_id) {
     auto entry = index_cache->search_from_cache(k, &cache_addr);
     if (entry) { // cache hit
       auto root = get_root_ptr(cxt, coro_id);
+      // this will by pass the page search.
       if (leaf_page_store(cache_addr, k, v, root, 0, cxt, coro_id, true)) {
 
         cache_hit[dsm->getMyThreadID()][0]++;
@@ -628,7 +629,9 @@ next:
   leaf_page_del(p, k, 0, cxt, coro_id);
 }
 //Node ID in GLobalAddress for a tree pointer should be the id in the Memory pool
-// THis funciton will get the page and check the consistency if not, then reread it
+// THis funciton will get the page by the page addr and search the pointer for the
+// next level if it is not leaf page. If it is a leaf page, just put the value in the
+// result
 bool Tree::page_search(GlobalAddress page_addr, const Key &k,
                        SearchResult &result, CoroContext *cxt, int coro_id,
                        bool from_cache) {
@@ -1049,6 +1052,7 @@ bool Tree::leaf_page_store(GlobalAddress page_addr, const Key &k,
                         coro_id);
   } else {
     assert(from_cache);
+    //If the program comes here, then it could be dangerous
     insert_internal(split_key, sibling_addr, cxt, coro_id, level + 1);
   }
 
