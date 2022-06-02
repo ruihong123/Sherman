@@ -301,7 +301,7 @@ bool rdmaCompareAndSwap(ibv_qp *qp, uint64_t source, uint64_t dest,
   }
 
   wr.wr.atomic.remote_addr = dest;
-    printf("Lock dest %p\n", dest);
+//    printf("Lock dest %p\n", dest);
   wr.wr.atomic.rkey = remoteRKey;
   wr.wr.atomic.compare_add = compare;
   wr.wr.atomic.swap = swap;
@@ -369,7 +369,7 @@ bool rdmaWriteBatch(ibv_qp *qp, RdmaOpRegion *ror, int k, bool isSignaled,
     }
 
     wr[i].wr.rdma.remote_addr = ror[i].dest;
-      printf("Unlock dest %p\n", ror[i].dest);
+//      printf("Unlock dest %p\n", ror[i].dest);
     wr[i].wr.rdma.rkey = ror[i].remoteRKey;
     wr[i].wr_id = wrID;
   }
