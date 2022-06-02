@@ -41,7 +41,7 @@ private:
   std::atomic<int64_t> free_page_cnt;
   std::atomic<int64_t> skiplist_node_cnt;
   int64_t all_page_cnt;
-
+  std::mutex mutex_pool[1000];
   // SkipList
   CacheSkipList *skiplist;
   CacheEntryComparator cmp;
@@ -138,11 +138,13 @@ inline bool IndexCache::add_to_cache(InternalPage *page) {
 inline const CacheEntry *IndexCache::search_from_cache(const Key &k,
                                                        GlobalAddress *addr) {
   auto entry = find_entry(k);
-
+  // the entry->ptr here should be an atomic variable.
   InternalPage *page = entry ? entry->ptr : nullptr;
 
   if (page && entry->from <= k && entry->to >= k) {// this track will definitely happen
-
+      std::unique_lock<std::mutex> lck(mutex_pool[(uint64_t)(page)%1000]);
+      if (entry->ptr == nullptr)
+          return nullptr;
     // if (enter_debug) {
     //   page->verbose_debug();
     // }
@@ -209,6 +211,7 @@ inline bool IndexCache::invalidate(const CacheEntry *entry) {
   }
 
   if (__sync_bool_compare_and_swap(&(entry->ptr), ptr, 0)) {
+      std::unique_lock<std::mutex> lk(mutex_pool[(uint64_t)ptr%1000]);
     free(ptr);
     free_page_cnt.fetch_add(1);
     return true;
