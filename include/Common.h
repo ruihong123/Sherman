@@ -48,6 +48,10 @@
 #define NR_DIRECTORY 1
 
 #define DIR_MESSAGE_NR 128
+
+#define KEYLENGTH 20
+
+#define VALUELENGTH 400
 // }
 
 void bindCore(uint16_t core);
@@ -108,20 +112,45 @@ static inline unsigned long long asm_rdtsc(void) {
   __asm__ __volatile__("rdtsc" : "=a"(lo), "=d"(hi));
   return ((unsigned long long)lo) | (((unsigned long long)hi) << 32);
 }
+
 struct Key_buff {
-    char buffer[20];
+    char buffer[KEYLENGTH];
 };
+
 struct Value_buff {
-    char buffer[400];
+    char data[VALUELENGTH];
+    bool operator==(Value_buff& b){
+        return memcmp(this->data, b.data, VALUELENGTH) == 0;
+//        if ((uint64_t) b.data == (uint64_t)this->data){
+//            return true;
+//        }
+//        return false;
+    }
+    bool operator!=(const Value_buff& b){
+        return memcmp(this->data, b.data, VALUELENGTH) != 0;
+    }
+    bool operator<(const Value_buff& b){
+        return memcmp(this->data, b.data, VALUELENGTH) < 0;
+    }
+    bool operator>(const Value_buff& b){
+        return memcmp(this->data, b.data, VALUELENGTH) > 0;
+    }
+    bool operator<=(const Value_buff& b){
+        return memcmp(this->data, b.data, VALUELENGTH) <= 0;
+    }
+    bool operator>=(const Value_buff& b){
+        return memcmp(this->data, b.data, VALUELENGTH) >= 0;
+    }
 };
 // For Tree
 using Key = uint64_t;
-using Value = uint64_t;
+//using Value = uint64_t;
 //using Key = Key_buff;
-//using Value = Value_buff;
+using Value = Value_buff;
 constexpr Key kKeyMin = std::numeric_limits<Key>::min();
 constexpr Key kKeyMax = std::numeric_limits<Key>::max();
-//constexpr Value kValueNull = 0;
+//constexpr Value kKeyNull = 0;
+constexpr Key kKeyNull = {};
 constexpr Value kValueNull = {};
 constexpr uint32_t kInternalPageSize = 1024;
 constexpr uint32_t kLeafPageSize = 1024;

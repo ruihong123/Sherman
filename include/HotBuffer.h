@@ -15,7 +15,7 @@ public:
   HotBuffer() {
     buf = new std::atomic<Key>[kBufferSize];
     for (int i = 0; i < kBufferSize; ++i) {
-      buf[i].store(kValueNull);
+      buf[i].store(kKeyNull);
     }
   };
 
@@ -26,11 +26,11 @@ public:
     if (value == key) {
       return HotResult::OCCUPIED;
     }
-    if (value != kValueNull) {
+    if (value != kKeyNull) {
       return HotResult::FAIL;
     }
     
-    Key null_key = kValueNull;
+    Key null_key = kKeyNull;
     auto res =  buf[index].compare_exchange_strong(null_key, key);
 
     return res ? HotResult::SUCC : HotResult::FAIL;
@@ -38,7 +38,7 @@ public:
 
   void clear(const Key &key) {
     size_t index = key % kBufferSize;
-    buf[index].store(kValueNull);
+    buf[index].store(kKeyNull);
   }
 
   bool wait(const Key &key) {

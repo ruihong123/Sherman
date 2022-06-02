@@ -3,13 +3,13 @@
 
 #include "Common.h"
 
-// abstract rdma registered buffer
+// abstract rdma registered data
 class RdmaBuffer {
 
 private:
-  static const int kPageBufferCnt = 8;    // async, buffer safty
-  static const int kSiblingBufferCnt = 8; // async, buffer safty
-  static const int kCasBufferCnt = 8;     // async, buffer safty
+  static const int kPageBufferCnt = 8;    // async, data safty
+  static const int kSiblingBufferCnt = 8; // async, data safty
+  static const int kCasBufferCnt = 8;     // async, data safty
 
   char *buffer;
 
@@ -39,7 +39,7 @@ public:
 
   void set_buffer(char *buffer) {
 
-    // printf("set buffer %p\n", buffer);
+    // printf("set data %p\n", data);
 
     kPageSize = std::max(kLeafPageSize, kInternalPageSize);
     this->buffer = buffer;

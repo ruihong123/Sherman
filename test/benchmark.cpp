@@ -84,7 +84,41 @@ private:
 RequstGen *coro_func(int coro_id, DSM *dsm, int id) {
   return new RequsetGenBench(coro_id, dsm, id);
 }
+void GenerateKeyFromInt(uint64_t v, int64_t num_keys, Slice* key) {
 
+    char* start = const_cast<char*>(key->data());
+    char* pos = start;
+//    if (keys_per_prefix_ > 0) {
+//      int64_t num_prefix = num_keys / keys_per_prefix_;
+//      int64_t prefix = v % num_prefix;
+//      int bytes_to_fill = std::min(prefix_size_, 8);
+//      if (port::kLittleEndian) {
+//        for (int i = 0; i < bytes_to_fill; ++i) {
+//          pos[i] = (prefix >> ((bytes_to_fill - i - 1) << 3)) & 0xFF;
+//        }
+//      } else {
+//        memcpy(pos, static_cast<void*>(&prefix), bytes_to_fill);
+//      }
+//      if (prefix_size_ > 8) {
+//        // fill the rest with 0s
+//        memset(pos + 8, '0', prefix_size_ - 8);
+//      }
+//      pos += prefix_size_;
+//    }
+
+    int bytes_to_fill = std::min(KEYLENGTH, 8);
+    if (port::kLittleEndian) {
+        for (int i = 0; i < bytes_to_fill; ++i) {
+            pos[i] = (v >> ((bytes_to_fill - i - 1) << 3)) & 0xFF;
+        }
+    } else {
+        memcpy(pos, static_cast<void*>(&v), bytes_to_fill);
+    }
+    pos += bytes_to_fill;
+    if (KEYLENGTH > pos - start) {
+        memset(pos, '0', KEYLENGTH - (pos - start));
+    }
+}
 Timer bench_timer;
 std::atomic<int64_t> warmup_cnt{0};
 std::atomic_bool ready{false};

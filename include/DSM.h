@@ -26,7 +26,7 @@ public:
   uint64_t getThreadTag() { return thread_tag; }
 
   // RDMA operations
-  // buffer is registered memory
+  // data is registered memory
   void read(char *buffer, GlobalAddress gaddr, size_t size, bool signal = true,
             CoroContext *ctx = nullptr);
   void read_sync(char *buffer, GlobalAddress gaddr, size_t size,

@@ -203,18 +203,18 @@ ibv_mr *createMemoryRegion(uint64_t mm, uint64_t mmSize, RdmaContext *ctx) {
 //  }
 //
 //  // init zero
-//  char *buffer = (char *)malloc(mmSize);
-//  memset(buffer, 0, mmSize);
+//  char *data = (char *)malloc(mmSize);
+//  memset(data, 0, mmSize);
 //
 //  struct ibv_exp_memcpy_dm_attr cpy_attr;
 //  memset(&cpy_attr, 0, sizeof(cpy_attr));
 //  cpy_attr.memcpy_dir = IBV_EXP_DM_CPY_TO_DEVICE;
-//  cpy_attr.host_addr = (void *)buffer;
+//  cpy_attr.host_addr = (void *)data;
 //  cpy_attr.length = mmSize;
 //  cpy_attr.dm_offset = 0;
 //  ibv_exp_memcpy_dm(dm, &cpy_attr);
 //
-//  free(buffer);
+//  free(data);
 //
 //  return mr;
 //}
