@@ -1,6 +1,7 @@
 #include "Timer.h"
 #include "Tree.h"
 #include "zipf.h"
+#include "third_party/random.h"
 
 #include <city.h>
 #include <stdlib.h>
@@ -30,7 +31,8 @@ int kReadRatio;
 int kThreadCount;
 int kComputeNodeCount;
 int kMemoryNodeCount;
-uint64_t kKeySpace = 64 * define::MB;
+//uint64_t kKeySpace = 64 * define::MB;
+uint64_t kKeySpace = 100*1000*1000;
 double kWarmRatio = 0.8;
 
 double zipfan = 0;
@@ -89,8 +91,9 @@ Timer bench_timer;
 std::atomic<int64_t> warmup_cnt{0};
 std::atomic_bool ready{false};
 void thread_run(int id) {
+    Random64 rand(id);
 
-  bindCore(id);
+    bindCore(id);
 
   dsm->registerThread();
 
@@ -160,8 +163,8 @@ void thread_run(int id) {
     }
     // the dis range is [0, 64M]
     uint64_t dis = mehcached_zipf_next(&state);
-
-    uint64_t key = to_key(dis);
+    uint64_t key = rand.Next()%(kKeySpace);
+//    uint64_t key = to_key(dis);
 
     Value v;
 

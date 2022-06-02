@@ -48,6 +48,14 @@
 #define NR_DIRECTORY 1
 
 #define DIR_MESSAGE_NR 128
+
+#define kInternalPageSize 1024
+
+#define kLeafPageSize 1024
+
+#define KEY_PADDING 12
+
+#define VALUE_PADDING 392
 // }
 
 void bindCore(uint16_t core);
@@ -123,8 +131,8 @@ constexpr Key kKeyMin = std::numeric_limits<Key>::min();
 constexpr Key kKeyMax = std::numeric_limits<Key>::max();
 //constexpr Value kValueNull = 0;
 constexpr Value kValueNull = {};
-constexpr uint32_t kInternalPageSize = 1024;
-constexpr uint32_t kLeafPageSize = 1024;
+//constexpr uint32_t kInternalPageSize = 1024;
+//constexpr uint32_t kLeafPageSize = 1024;
 
 __inline__ unsigned long long rdtsc(void) {
   unsigned hi, lo;

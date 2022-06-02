@@ -7,6 +7,12 @@
 #include <functional>
 #include <iostream>
 
+#define kInternalCardinality   (kInternalPageSize - sizeof(Header) - sizeof(uint8_t) * 2) /sizeof(InternalEntry)
+#define kLeafCardinality  (kLeafPageSize - sizeof(Header) - sizeof(uint8_t) * 2) / sizeof(LeafEntry)
+
+#define InternalPagePadding (kInternalPageSize - sizeof(Header) - sizeof(uint8_t) * 2)%sizeof(InternalEntry)
+
+#define LeafPagePadding (kLeafPageSize - sizeof(Header) - sizeof(uint8_t) * 2)%sizeof(LeafEntry)
 class IndexCache;
 
 struct LocalLockNode {
@@ -170,6 +176,7 @@ public:
 class InternalEntry {
 public:
   Key key;
+  char key_padding[KEY_PADDING];
   GlobalAddress ptr;
 
   InternalEntry() {
@@ -183,7 +190,9 @@ class LeafEntry {
 public:
   uint8_t f_version : 4;
   Key key;
+  char key_padding[KEY_PADDING];
   Value value;
+  char value_padding[VALUE_PADDING];
   uint8_t r_version : 4;
 
   LeafEntry() {
@@ -195,12 +204,12 @@ public:
   }
 } __attribute__((packed));
 
-constexpr int kInternalCardinality =
-    (kInternalPageSize - sizeof(Header) - sizeof(uint8_t) * 2) /
-    sizeof(InternalEntry);
+//constexpr int kInternalCardinality =
+//    (kInternalPageSize - sizeof(Header) - sizeof(uint8_t) * 2) /
+//    sizeof(InternalEntry);
 
-constexpr int kLeafCardinality =
-    (kLeafPageSize - sizeof(Header) - sizeof(uint8_t) * 2) / sizeof(LeafEntry);
+//constexpr int kLeafCardinality =
+//    (kLeafPageSize - sizeof(Header) - sizeof(uint8_t) * 2) / sizeof(LeafEntry);
 
 class InternalPage {
   // private:
@@ -214,7 +223,7 @@ class InternalPage {
   Header hdr;
   InternalEntry records[kInternalCardinality];
 
-  uint8_t padding[3];
+  uint8_t padding[InternalPagePadding];
   uint8_t rear_version;
 
   friend class Tree;
@@ -297,7 +306,7 @@ private:
   Header hdr;
   LeafEntry records[kLeafCardinality];
 
-  uint8_t padding[1];
+  uint8_t padding[LeafPagePadding];
   uint8_t rear_version;
 
   friend class Tree;
