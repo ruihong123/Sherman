@@ -251,7 +251,7 @@ inline bool Tree::try_lock_addr(GlobalAddress lock_addr, uint64_t tag,
       assert(false);
     }
 
-    bool res = dsm->cas_sync(lock_addr, 0, tag, buf, cxt);
+    bool res = dsm->cas_dm_sync(lock_addr, 0, tag, buf, cxt);
 
     pattern_cnt++;
     if (!res) {
@@ -282,9 +282,9 @@ inline void Tree::unlock_addr(GlobalAddress lock_addr, uint64_t tag,
 
   *cas_buf = 0;
   if (async) {
-    dsm->write((char *)cas_buf, lock_addr, sizeof(uint64_t), false);
+    dsm->write_dm((char *)cas_buf, lock_addr, sizeof(uint64_t), false);
   } else {
-    dsm->write_sync((char *)cas_buf, lock_addr, sizeof(uint64_t), cxt);
+    dsm->write_dm_sync((char *)cas_buf, lock_addr, sizeof(uint64_t), cxt);
   }
 
   releases_local_lock(lock_addr);
@@ -306,13 +306,13 @@ void Tree::write_page_and_unlock(char *page_buffer, GlobalAddress page_addr,
   rs[0].source = (uint64_t)page_buffer;
   rs[0].dest = page_addr;
   rs[0].size = page_size;
-  rs[0].is_on_chip = false;
+  rs[0].is_lock_mr = false;
 
   rs[1].source = (uint64_t)dsm->get_rbuf(coro_id).get_cas_buffer();
   rs[1].dest = lock_addr;
   rs[1].size = sizeof(uint64_t);
 
-  rs[1].is_on_chip = true;
+  rs[1].is_lock_mr = true;
 
   *(uint64_t *)rs[1].source = 0;
   if (async) {

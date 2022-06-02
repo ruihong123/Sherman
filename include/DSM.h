@@ -77,22 +77,22 @@ public:
 //                         uint64_t *rdma_buffer, uint64_t mask = 63,
 //                         CoroContext *ctx = nullptr);
 
-  // for on-chip device memory
-//  void read_dm(char *buffer, GlobalAddress gaddr, size_t size,
-//               bool signal = true, CoroContext *ctx = nullptr);
-//  void read_dm_sync(char *buffer, GlobalAddress gaddr, size_t size,
-//                    CoroContext *ctx = nullptr);
-//
-//  void write_dm(const char *buffer, GlobalAddress gaddr, size_t size,
-//                bool signal = true, CoroContext *ctx = nullptr);
-//  void write_dm_sync(const char *buffer, GlobalAddress gaddr, size_t size,
-//                     CoroContext *ctx = nullptr);
-//
-//  void cas_dm(GlobalAddress gaddr, uint64_t equal, uint64_t val,
-//              uint64_t *rdma_buffer, bool signal = true,
-//              CoroContext *ctx = nullptr);
-//  bool cas_dm_sync(GlobalAddress gaddr, uint64_t equal, uint64_t val,
-//                   uint64_t *rdma_buffer, CoroContext *ctx = nullptr);
+  // for on-chip device memory, actually its for lock memory region.
+  void read_dm(char *buffer, GlobalAddress gaddr, size_t size,
+               bool signal = true, CoroContext *ctx = nullptr);
+  void read_dm_sync(char *buffer, GlobalAddress gaddr, size_t size,
+                    CoroContext *ctx = nullptr);
+
+  void write_dm(const char *buffer, GlobalAddress gaddr, size_t size,
+                bool signal = true, CoroContext *ctx = nullptr);
+  void write_dm_sync(const char *buffer, GlobalAddress gaddr, size_t size,
+                     CoroContext *ctx = nullptr);
+
+  void cas_dm(GlobalAddress gaddr, uint64_t equal, uint64_t val,
+              uint64_t *rdma_buffer, bool signal = true,
+              CoroContext *ctx = nullptr);
+  bool cas_dm_sync(GlobalAddress gaddr, uint64_t equal, uint64_t val,
+                   uint64_t *rdma_buffer, CoroContext *ctx = nullptr);
 
 //  void cas_dm_mask(GlobalAddress gaddr, uint64_t equal, uint64_t val,
 //                   uint64_t *rdma_buffer, uint64_t mask = ~(0ull),

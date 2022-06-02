@@ -29,7 +29,7 @@ struct RdmaOpRegion {
   uint32_t lkey;
   union {
     uint32_t remoteRKey;
-    bool is_on_chip;
+    bool is_lock_mr;
   };
 };
 
