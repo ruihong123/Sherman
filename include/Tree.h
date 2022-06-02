@@ -11,8 +11,10 @@
 #define kLeafCardinality  (kLeafPageSize - sizeof(Header) - sizeof(uint8_t) * 2) / sizeof(LeafEntry)
 
 #define InternalPagePadding (kInternalPageSize - sizeof(Header) - sizeof(uint8_t) * 2)%sizeof(InternalEntry)
-
+// InternalPagePadding is 7 for key 20 bytes value 400 bytes
 #define LeafPagePadding (kLeafPageSize - sizeof(Header) - sizeof(uint8_t) * 2)%sizeof(LeafEntry)
+// LeafPagePadding is 143 for key 20 bytes value 400 bytes.
+
 class IndexCache;
 
 struct LocalLockNode {
