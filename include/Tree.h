@@ -7,13 +7,13 @@
 #include <functional>
 #include <iostream>
 
-#define kInternalCardinality   (kInternalPageSize - sizeof(Header) - sizeof(uint8_t) * 2) /sizeof(InternalEntry)
-#define kLeafCardinality  (kLeafPageSize - sizeof(Header) - sizeof(uint8_t) * 2) / sizeof(LeafEntry)
+//#define kInternalCardinality   (kInternalPageSize - sizeof(Header) - sizeof(uint8_t) * 2) /sizeof(InternalEntry)
+//#define kLeafCardinality  (kLeafPageSize - sizeof(Header) - sizeof(uint8_t) * 2) / sizeof(LeafEntry)
 
-#define InternalPagePadding (kInternalPageSize - sizeof(Header) - sizeof(uint8_t) * 2)%sizeof(InternalEntry)
-// InternalPagePadding is 7 for key 20 bytes value 400 bytes
-#define LeafPagePadding (kLeafPageSize - sizeof(Header) - sizeof(uint8_t) * 2)%sizeof(LeafEntry)
-// LeafPagePadding is 143 for key 20 bytes value 400 bytes.
+//#define InternalPagePadding (kInternalPageSize - sizeof(Header) - sizeof(uint8_t) * 2)%sizeof(InternalEntry)
+//// InternalPagePadding is 7 for key 20 bytes value 400 bytes
+//#define LeafPagePadding (kLeafPageSize - sizeof(Header) - sizeof(uint8_t) * 2)%sizeof(LeafEntry)
+//// LeafPagePadding is 143 for key 20 bytes value 400 bytes.
 
 class IndexCache;
 
@@ -206,12 +206,12 @@ public:
   }
 } __attribute__((packed));
 
-//constexpr int kInternalCardinality =
-//    (kInternalPageSize - sizeof(Header) - sizeof(uint8_t) * 2) /
-//    sizeof(InternalEntry);
+constexpr int kInternalCardinality =
+    (kInternalPageSize - sizeof(Header) - sizeof(uint8_t) * 2) /
+    sizeof(InternalEntry);
 
-//constexpr int kLeafCardinality =
-//    (kLeafPageSize - sizeof(Header) - sizeof(uint8_t) * 2) / sizeof(LeafEntry);
+constexpr int kLeafCardinality =
+    (kLeafPageSize - sizeof(Header) - sizeof(uint8_t) * 2) / sizeof(LeafEntry);
 
 class InternalPage {
   // private:
@@ -225,7 +225,7 @@ class InternalPage {
   Header hdr;
   InternalEntry records[kInternalCardinality];
 
-  uint8_t padding[InternalPagePadding];
+//  uint8_t padding[InternalPagePadding];
   uint8_t rear_version;
 
   friend class Tree;
@@ -308,7 +308,7 @@ private:
   Header hdr;
   LeafEntry records[kLeafCardinality];
 
-  uint8_t padding[LeafPagePadding];
+//  uint8_t padding[LeafPagePadding];
   uint8_t rear_version;
 
   friend class Tree;
