@@ -251,7 +251,7 @@ inline bool Tree::try_lock_addr(GlobalAddress lock_addr, uint64_t tag,
       assert(false);
     }
 
-    bool res = dsm->cas_dm_sync(lock_addr, 0, tag, buf, cxt);
+    bool res = dsm->cas_sync(lock_addr, 0, tag, buf, cxt);
 
     pattern_cnt++;
     if (!res) {
@@ -282,9 +282,9 @@ inline void Tree::unlock_addr(GlobalAddress lock_addr, uint64_t tag,
 
   *cas_buf = 0;
   if (async) {
-    dsm->write_dm((char *)cas_buf, lock_addr, sizeof(uint64_t), false);
+    dsm->write((char *)cas_buf, lock_addr, sizeof(uint64_t), false);
   } else {
-    dsm->write_dm_sync((char *)cas_buf, lock_addr, sizeof(uint64_t), cxt);
+    dsm->write_sync((char *)cas_buf, lock_addr, sizeof(uint64_t), cxt);
   }
 
   releases_local_lock(lock_addr);
