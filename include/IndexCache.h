@@ -143,7 +143,7 @@ inline const CacheEntry *IndexCache::search_from_cache(const Key &k,
 
   if (page && entry->from <= k && entry->to >= k) {// this track will definitely happen
       std::unique_lock<std::mutex> lck(mutex_pool[(uint64_t)(page)%1000]);
-      if (entry->ptr == nullptr)
+      if (entry->ptr != page)
           return nullptr;
     // if (enter_debug) {
     //   page->verbose_debug();
@@ -211,7 +211,7 @@ inline bool IndexCache::invalidate(const CacheEntry *entry) {
   }
 
   if (__sync_bool_compare_and_swap(&(entry->ptr), ptr, 0)) {
-      std::unique_lock<std::mutex> lk(mutex_pool[(uint64_t)ptr%1000]);
+      std::unique_lock<std::mutex> lk(mutex_pool[(uint64_t)(ptr)%1000]);
     free(ptr);
     free_page_cnt.fetch_add(1);
     return true;
