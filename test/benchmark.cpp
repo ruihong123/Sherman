@@ -162,7 +162,7 @@ void thread_run(int id) {
         ;
     }
     // the dis range is [0, 64M]
-    uint64_t dis = mehcached_zipf_next(&state);
+//    uint64_t dis = mehcached_zipf_next(&state);
     uint64_t key = rand.Next()%(kKeySpace);
 //    uint64_t key = to_key(dis);
 
