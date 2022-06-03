@@ -108,7 +108,7 @@ constexpr int64_t kPerCoroRdmaBuf = 128 * 1024;
 
 constexpr uint8_t kMaxHandOverTime = 8;
 
-constexpr int kIndexCacheSize = 8000; // MB
+constexpr int kIndexCacheSize = 16000; // MB
 } // namespace define
 
 static inline unsigned long long asm_rdtsc(void) {
