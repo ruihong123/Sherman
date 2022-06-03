@@ -207,11 +207,11 @@ public:
 } __attribute__((packed));
 
 constexpr int kInternalCardinality =
-    (kInternalPageSize - sizeof(Header) - sizeof(uint8_t) * 2) /
+    (kInternalPageSize - sizeof(Header) - sizeof(uint8_t) * 2 - 8) /
     sizeof(InternalEntry);
 
 constexpr int kLeafCardinality =
-    (kLeafPageSize - sizeof(Header) - sizeof(uint8_t) * 2) / sizeof(LeafEntry);
+    (kLeafPageSize - sizeof(Header) - sizeof(uint8_t) * 2 - 8) / sizeof(LeafEntry);
 
 class InternalPage {
   // private:
