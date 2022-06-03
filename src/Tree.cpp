@@ -1016,7 +1016,7 @@ bool Tree::leaf_page_store(GlobalAddress page_addr, const Key &k,
     // (int)(page->hdr.level) << std::endl;
 
     int m = cnt / 2;
-    split_key = page->records[m].key;
+    split_key = page->records[m-1].key;
     assert(split_key > page->hdr.lowest);
     assert(split_key < page->hdr.highest);
       page->hdr.last_index -= (cnt - m);
