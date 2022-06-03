@@ -113,7 +113,7 @@ void thread_run(int id) {
     if (i % all_thread == my_id) {
       tree->insert(i, i * 2);
     }
-      if (i % 1000000 == 0 ){
+      if (i % 1000000 == 0 && id == 1){
           printf("warm up number: %lu\r", i);
       }
   }
