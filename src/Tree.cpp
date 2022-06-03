@@ -1019,23 +1019,24 @@ bool Tree::leaf_page_store(GlobalAddress page_addr, const Key &k,
     split_key = page->records[m].key;
     assert(split_key > page->hdr.lowest);
     assert(split_key < page->hdr.highest);
+      page->hdr.last_index -= (cnt - m);
+      sibling->hdr.last_index += (cnt - m);
 
+      sibling->hdr.lowest = split_key;
+      sibling->hdr.highest = page->hdr.highest;
+      page->hdr.highest = page->records[m-1].key;
+//    page->hdr.highest = split_key;// this is problematic.
+
+      // link
+      sibling->hdr.sibling_ptr = page->hdr.sibling_ptr;
+      page->hdr.sibling_ptr = sibling_addr;
     for (int i = m; i < cnt; ++i) { // move
       sibling->records[i - m].key = page->records[i].key;
       sibling->records[i - m].value = page->records[i].value;
       page->records[i].key = 0;
       page->records[i].value = kValueNull;
     }
-    page->hdr.last_index -= (cnt - m);
-    sibling->hdr.last_index += (cnt - m);
 
-    sibling->hdr.lowest = split_key;
-    sibling->hdr.highest = page->hdr.highest;
-    page->hdr.highest = split_key;
-
-    // link
-    sibling->hdr.sibling_ptr = page->hdr.sibling_ptr;
-    page->hdr.sibling_ptr = sibling_addr;
 
     sibling->set_consistent();
     dsm->write_sync(sibling_buf, sibling_addr, kLeafPageSize, cxt);
