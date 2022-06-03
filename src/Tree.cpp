@@ -135,7 +135,7 @@ void Tree::broadcast_new_root(GlobalAddress new_root_addr, int root_level) {
   m.type = RpcType::NEW_ROOT;
   m.addr = new_root_addr;
   m.level = root_level;
-  if (root_level >= 2) {
+  if (root_level >= 4) {
         enable_cache = true;
   }
   //TODO: When we seperate the compute from the memory, how can we broad cast the new root
