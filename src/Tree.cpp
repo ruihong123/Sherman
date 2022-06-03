@@ -417,7 +417,7 @@ void Tree::insert(const Key &k, const Value &v, CoroContext *cxt, int coro_id) {
       }
       // cache stale, from root,
       index_cache->invalidate(entry);
-        printf("Invalidate cache\n");
+//        printf("Invalidate cache\n");
     }
     cache_miss[dsm->getMyThreadID()][0]++;
   }
@@ -484,7 +484,7 @@ next:
   if (!page_search(p, k, result, cxt, coro_id, from_cache)) {
     if (from_cache) { // cache stale
       index_cache->invalidate(entry);
-        printf("Invalidate cache\n");
+//        printf("Invalidate cache\n");
       cache_hit[dsm->getMyThreadID()][0]--;
       cache_miss[dsm->getMyThreadID()][0]++;
       from_cache = false;
