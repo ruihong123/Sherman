@@ -445,7 +445,7 @@ next:
     }
 
     p = result.next_level;
-    printf("next level pointer is %p", p);
+    printf("next level pointer is %p\n", p);
     if (result.level != 1) {
       goto next;
     }
