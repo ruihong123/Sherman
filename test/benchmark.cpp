@@ -107,7 +107,8 @@ void thread_run(int id) {
     bench_timer.begin();
   }
 
-  uint64_t end_warm_key = kWarmRatio * kKeySpace;
+  uint64_t end_warm_key = kKeySpace;
+  //kWarmRatio *
   for (uint64_t i = 1; i < end_warm_key; ++i) {
     if (i % all_thread == my_id) {
       tree->insert(to_key(i), i * 2);
