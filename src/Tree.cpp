@@ -445,7 +445,7 @@ next:
     }
 
     p = result.next_level;
-    printf("next level pointer is %p\n", p);
+//    printf("next level pointer is %p\n", p);
     if (result.level != 1) {
       goto next;
     }
@@ -726,19 +726,19 @@ void Tree::internal_page_search(InternalPage *page, const Key &k,
   auto cnt = page->hdr.last_index + 1;
   // page->debug();
   if (k < page->records[0].key) {
-      printf("next level pointer is  leftmost %p \n", page->hdr.leftmost_ptr);
+//      printf("next level pointer is  leftmost %p \n", page->hdr.leftmost_ptr);
     result.next_level = page->hdr.leftmost_ptr;
     return;
   }
 
   for (int i = 1; i < cnt; ++i) {
     if (k < page->records[i].key) {
-        printf("next level pointer is %p \n", page->records[i - 1].ptr);
+//        printf("next level pointer is %p \n", page->records[i - 1].ptr);
       result.next_level = page->records[i - 1].ptr;
       return;
     }
   }
-    printf("next level pointer is  the last value %p \n", page->records[cnt - 1].ptr);
+//    printf("next level pointer is  the last value %p \n", page->records[cnt - 1].ptr);
 
     result.next_level = page->records[cnt - 1].ptr;
 }
