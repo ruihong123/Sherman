@@ -670,7 +670,7 @@ re_read:
 
     assert(result.level == 0);
     if (k >= page->hdr.highest) { // should turn right
-        printf("should turn right ");
+//        printf("should turn right ");
       result.slibing = page->hdr.sibling_ptr;
       return true;
     }
@@ -699,7 +699,7 @@ re_read:
     }
 
     if (k >= page->hdr.highest) { // should turn right
-        printf("should turn right ");
+//        printf("should turn right ");
       result.slibing = page->hdr.sibling_ptr;
       return true;
     }
