@@ -866,6 +866,9 @@ void Tree::internal_page_store(GlobalAddress page_addr, const Key &k,
       sibling->hdr.sibling_ptr = page->hdr.sibling_ptr;
       page->hdr.sibling_ptr = sibling_addr;
     sibling->set_consistent();
+    //the code below is just for debugging.
+    sibling_addr.val = sibling->hdr.sibling_ptr;
+
     dsm->write_sync(sibling_buf, sibling_addr, kInternalPageSize, cxt);
   }
 
