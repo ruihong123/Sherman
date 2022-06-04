@@ -1035,10 +1035,12 @@ bool Tree::leaf_page_store(GlobalAddress page_addr, const Key &k,
           page->records[i].key = 0;
           page->records[i].value = kValueNull;
       }
+      //We don't care about the last index in the leaf nodes actually,
+      // because we iterate all the slots to find an entry.
       page->hdr.last_index -= (cnt - m);
-      assert(page_addr == root || page->hdr.last_index == m-1);
+//      assert(page_addr == root || page->hdr.last_index == m-1);
       sibling->hdr.last_index += (cnt - m);
-      assert(sibling->hdr.last_index == cnt -m -1);
+//      assert(sibling->hdr.last_index == cnt -m -1);
       sibling->hdr.lowest = split_key;
       sibling->hdr.highest = page->hdr.highest;
       page->hdr.highest = split_key;
