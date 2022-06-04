@@ -808,6 +808,7 @@ void Tree::internal_page_store(GlobalAddress page_addr, const Key &k,
   assert(page->records[page->hdr.last_index].ptr != GlobalAddress::Null());
   bool is_update = false;
   uint16_t insert_index = 0;
+  //TODO: Make it a binary search.
   for (int i = cnt - 1; i >= 0; --i) {
     if (page->records[i].key == k) { // find and update
       page->records[i].ptr = v;
@@ -832,6 +833,7 @@ void Tree::internal_page_store(GlobalAddress page_addr, const Key &k,
 
     page->hdr.last_index++;
   }
+  assert(page->records[page->hdr.last_index].ptr != GlobalAddress::Null());
 
   cnt = page->hdr.last_index + 1;
   bool need_split = cnt == kInternalCardinality;
@@ -876,8 +878,10 @@ void Tree::internal_page_store(GlobalAddress page_addr, const Key &k,
       assert(page->records[page->hdr.last_index].ptr != GlobalAddress::Null());
 
   }
+//  assert(page->records[page->hdr.last_index].ptr != GlobalAddress::Null());
 
-  page->set_consistent();
+
+    page->set_consistent();
   write_page_and_unlock(page_buffer, page_addr, kInternalPageSize, cas_buffer,
                         lock_addr, tag, cxt, coro_id, need_split);
 
