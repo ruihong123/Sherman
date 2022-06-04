@@ -844,26 +844,25 @@ void Tree::internal_page_store(GlobalAddress page_addr, const Key &k,
     //    std::cout << "addr " <<  sibling_addr << " | level " <<
     //    (int)(page->hdr.level) << std::endl;
       assert(page->hdr.last_index = cnt - 1);
-    int m = cnt / 2;
-    split_key = page->records[m].key;
-    assert(split_key > page->hdr.lowest);
-    assert(split_key < page->hdr.highest);
+      int m = cnt / 2;
+      split_key = page->records[m].key;
+      assert(split_key > page->hdr.lowest);
+      assert(split_key < page->hdr.highest);
+      for (int i = m + 1; i < cnt; ++i) { // move
+          sibling->records[i - m - 1].key = page->records[i].key;
+          sibling->records[i - m - 1].ptr = page->records[i].ptr;
+      }
+      page->hdr.last_index -= (cnt - m);
+      sibling->hdr.last_index += (cnt - m - 1);
 
-    for (int i = m ; i < cnt; ++i) { // move
-      sibling->records[i - m].key = page->records[i].key;
-      sibling->records[i - m].ptr = page->records[i].ptr;
-    }
-    page->hdr.last_index -= (cnt - m);
-    sibling->hdr.last_index += (cnt - m);
+      sibling->hdr.leftmost_ptr = page->records[m].ptr;
+      sibling->hdr.lowest = page->records[m].key;
+      sibling->hdr.highest = page->hdr.highest;
+      page->hdr.highest = page->records[m].key;
 
-    sibling->hdr.leftmost_ptr = page->records[m].ptr;
-    sibling->hdr.lowest = page->records[m].key;
-    sibling->hdr.highest = page->hdr.highest;
-    page->hdr.highest = page->records[m].key;
-
-    // link
-    sibling->hdr.sibling_ptr = page->hdr.sibling_ptr;
-    page->hdr.sibling_ptr = sibling_addr;
+      // link
+      sibling->hdr.sibling_ptr = page->hdr.sibling_ptr;
+      page->hdr.sibling_ptr = sibling_addr;
 
     sibling->set_consistent();
     dsm->write_sync(sibling_buf, sibling_addr, kInternalPageSize, cxt);
