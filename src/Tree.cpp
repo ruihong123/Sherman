@@ -725,7 +725,7 @@ void Tree::internal_page_search(InternalPage *page, const Key &k,
 
   auto cnt = page->hdr.last_index + 1;
   // page->debug();
-  if (k < page->records[0].key) {
+  if (k < page->records[0].key) { // I changed here
 //      printf("next level pointer is  leftmost %p \n", page->hdr.leftmost_ptr);
     result.next_level = page->hdr.leftmost_ptr;
       assert(result.next_level != GlobalAddress::Null());
@@ -1015,30 +1015,27 @@ bool Tree::leaf_page_store(GlobalAddress page_addr, const Key &k,
     // std::cout << "addr " <<  sibling_addr << " | level " <<
     // (int)(page->hdr.level) << std::endl;
 
-    int m = cnt / 2;
-    //NOte the split leaf is the former split node's highest key, that the split key will
-    // be pointed to the new node
-    split_key = page->records[m - 1].key;
-//    assert(split_key > page->hdr.lowest);// no way if there isonly two entries
-    assert(split_key < page->hdr.highest);
+      int m = cnt / 2;
+      split_key = page->records[m].key;
+      assert(split_key > page->hdr.lowest);
+      assert(split_key < page->hdr.highest);
+
+      for (int i = m; i < cnt; ++i) { // move
+          sibling->records[i - m].key = page->records[i].key;
+          sibling->records[i - m].value = page->records[i].value;
+          page->records[i].key = 0;
+          page->records[i].value = kValueNull;
+      }
       page->hdr.last_index -= (cnt - m);
       sibling->hdr.last_index += (cnt - m);
 
-      sibling->hdr.lowest = page->records[m-1].key;
+      sibling->hdr.lowest = split_key;
       sibling->hdr.highest = page->hdr.highest;
-      page->hdr.highest = page->records[m-1].key;
-//    page->hdr.highest = split_key;// this is problematic.
+      page->hdr.highest = split_key;
 
       // link
       sibling->hdr.sibling_ptr = page->hdr.sibling_ptr;
       page->hdr.sibling_ptr = sibling_addr;
-    for (int i = m; i < cnt; ++i) { // move
-      sibling->records[i - m].key = page->records[i].key;
-      sibling->records[i - m].value = page->records[i].value;
-      page->records[i].key = 0;
-      page->records[i].value = kValueNull;
-    }
-
 
     sibling->set_consistent();
     dsm->write_sync(sibling_buf, sibling_addr, kLeafPageSize, cxt);
