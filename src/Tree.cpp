@@ -843,7 +843,6 @@ void Tree::internal_page_store(GlobalAddress page_addr, const Key &k,
 
     //    std::cout << "addr " <<  sibling_addr << " | level " <<
     //    (int)(page->hdr.level) << std::endl;
-      assert(page->hdr.last_index = cnt - 1);
       int m = cnt / 2;
       split_key = page->records[m].key;
       assert(split_key > page->hdr.lowest);
@@ -863,7 +862,6 @@ void Tree::internal_page_store(GlobalAddress page_addr, const Key &k,
       // link
       sibling->hdr.sibling_ptr = page->hdr.sibling_ptr;
       page->hdr.sibling_ptr = sibling_addr;
-
     sibling->set_consistent();
     dsm->write_sync(sibling_buf, sibling_addr, kInternalPageSize, cxt);
   }
