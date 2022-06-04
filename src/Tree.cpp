@@ -652,7 +652,6 @@ re_read:
   }
   dsm->read_sync(page_buffer, page_addr, kLeafPageSize, cxt);
   pattern_cnt++;
-
   memset(&result, 0, sizeof(result));
   result.is_leaf = header->leftmost_ptr == GlobalAddress::Null();
   result.level = header->level;
@@ -683,7 +682,9 @@ re_read:
     }
     leaf_page_search(page, k, result);
   } else {
-    assert(result.level != 0);
+      assert(((InternalPage*)page_buffer)->records[((InternalPage*)page_buffer)->hdr.last_index].ptr != GlobalAddress::Null());
+
+      assert(result.level != 0);
     assert(!from_cache);
     auto page = (InternalPage *)page_buffer;
 
@@ -834,6 +835,7 @@ void Tree::internal_page_store(GlobalAddress page_addr, const Key &k,
     page->hdr.last_index++;
   }
   assert(page->records[page->hdr.last_index].ptr != GlobalAddress::Null());
+  assert(page->records[page->hdr.last_index].key != 0);
 
   cnt = page->hdr.last_index + 1;
   bool need_split = cnt == kInternalCardinality;
