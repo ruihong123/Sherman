@@ -1036,7 +1036,7 @@ bool Tree::leaf_page_store(GlobalAddress page_addr, const Key &k,
           page->records[i].value = kValueNull;
       }
       page->hdr.last_index -= (cnt - m);
-      assert(page->hdr.last_index == m-1);
+      assert(page_addr == root || page->hdr.last_index == m-1);
       sibling->hdr.last_index += (cnt - m);
       assert(sibling->hdr.last_index == cnt -m -1);
       sibling->hdr.lowest = split_key;
