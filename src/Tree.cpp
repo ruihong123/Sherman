@@ -725,11 +725,11 @@ void Tree::internal_page_search(InternalPage *page, const Key &k,
 
   auto cnt = page->hdr.last_index + 1;
   // page->debug();
-  if (k < page->records[0].key) { // this actually not gonna happen, if happen then there is a bug
+  if (k < page->records[0].key) { // this only happen when the lowest is 0
 //      printf("next level pointer is  leftmost %p \n", page->hdr.leftmost_ptr);
     result.next_level = page->hdr.leftmost_ptr;
       assert(result.next_level != GlobalAddress::Null());
-      assert(false);//this actually should not happen
+      assert(page->hdr.lowest == 0);//this actually should not happen
     return;
   }
 
