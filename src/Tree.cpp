@@ -730,7 +730,7 @@ void Tree::internal_page_search(InternalPage *page, const Key &k,
     result.next_level = page->hdr.leftmost_ptr;
 //      result.upper_key = page->records[0].key;
       assert(result.next_level != GlobalAddress::Null());
-      assert(page->hdr.lowest == 0);//this actually should not happen
+//      assert(page->hdr.lowest == 0);//this actually should not happen
     return;
   }
 
