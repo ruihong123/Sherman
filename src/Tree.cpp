@@ -158,7 +158,7 @@ bool Tree::update_new_root(GlobalAddress left, const Key &k,
 
   auto new_root_addr = dsm->alloc(kInternalPageSize);
   // The code below is just for debugging
-//    new_root_addr.val = 3;
+//    new_root_addr.mark = 3;
   new_root->set_consistent();
   dsm->write_sync(page_buffer, new_root_addr, kInternalPageSize, cxt);
   if (dsm->cas_sync(root_ptr_ptr, old_root, new_root_addr, cas_buffer, cxt)) {
@@ -870,7 +870,7 @@ void Tree::internal_page_store(GlobalAddress page_addr, const Key &k,
       page->hdr.sibling_ptr = sibling_addr;
     sibling->set_consistent();
     //the code below is just for debugging.
-    sibling_addr.val = 2;
+//    sibling_addr.mark = 2;
 
     dsm->write_sync(sibling_buf, sibling_addr, kInternalPageSize, cxt);
   }

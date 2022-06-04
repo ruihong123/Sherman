@@ -14,6 +14,7 @@ union {
   };
   uint64_t val;
 };
+//    uint8_t mark;
 
  operator uint64_t() {
   return val;
