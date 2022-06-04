@@ -856,7 +856,7 @@ void Tree::internal_page_store(GlobalAddress page_addr, const Key &k,
       page->hdr.last_index -= (cnt - m); // this is correct.
       assert(page->hdr.last_index == m-1);
       sibling->hdr.last_index += (cnt - m - 1);
-      assert(page->hdr.last_index == cnt - m - 1 - 1);
+      assert(sibling->hdr.last_index == cnt - m - 1 - 1);
       sibling->hdr.leftmost_ptr = page->records[m].ptr;
       sibling->hdr.lowest = page->records[m].key;
       sibling->hdr.highest = page->hdr.highest;
