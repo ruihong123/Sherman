@@ -133,7 +133,7 @@ void DSM::read_sync(char *buffer, GlobalAddress gaddr, size_t size,
 
 void DSM::write(const char *buffer, GlobalAddress gaddr, size_t size,
                 bool signal, CoroContext *ctx) {
-
+    printf("node id is %d\n",gaddr.nodeID);
   if (ctx == nullptr) {
     rdmaWrite(iCon->data[0][gaddr.nodeID], (uint64_t)buffer,
               remoteInfo[gaddr.nodeID].dsmBase + gaddr.offset, size,
