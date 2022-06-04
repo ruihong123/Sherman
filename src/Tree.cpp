@@ -872,6 +872,9 @@ void Tree::internal_page_store(GlobalAddress page_addr, const Key &k,
 //    sibling_addr.mark = 2;
 
     dsm->write_sync(sibling_buf, sibling_addr, kInternalPageSize, cxt);
+      assert(sibling->records[page->hdr.last_index].ptr != GlobalAddress::Null());
+      assert(page->records[page->hdr.last_index].ptr != GlobalAddress::Null());
+
   }
 
   page->set_consistent();
