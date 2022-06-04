@@ -725,18 +725,21 @@ void Tree::internal_page_search(InternalPage *page, const Key &k,
 
   auto cnt = page->hdr.last_index + 1;
   // page->debug();
-  if (k < page->records[0].key) { // I changed here
+  if (k < page->records[0].key) { // this actually not gonna happen, if happen then there is a bug
 //      printf("next level pointer is  leftmost %p \n", page->hdr.leftmost_ptr);
     result.next_level = page->hdr.leftmost_ptr;
       assert(result.next_level != GlobalAddress::Null());
+      assert(false);//this actually should not happen
     return;
   }
 
   for (int i = 1; i < cnt; ++i) {
     if (k < page->records[i].key) {
-        printf("next level pointer is %p \n", page->records[i - 1].ptr);
+//        printf("next level key is %lu \n", page->records[i - 1].key);
       result.next_level = page->records[i - 1].ptr;
         assert(result.next_level != GlobalAddress::Null());
+        assert(page->records[i - 1].key < k);
+
       return;
     }
   }
@@ -744,6 +747,7 @@ void Tree::internal_page_search(InternalPage *page, const Key &k,
 
     result.next_level = page->records[cnt - 1].ptr;
     assert(result.next_level != GlobalAddress::Null());
+    assert(page->records[cnt - 1].key < k);
 }
 
 void Tree::leaf_page_search(LeafPage *page, const Key &k,
