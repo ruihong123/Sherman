@@ -42,6 +42,7 @@ struct SearchResult {
   uint8_t level;
   GlobalAddress slibing;
   GlobalAddress next_level;
+  Key upper_key;
   Value val;
 };
 
