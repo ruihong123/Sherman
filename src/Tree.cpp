@@ -835,6 +835,8 @@ void Tree::internal_page_store(GlobalAddress page_addr, const Key &k,
   bool need_split = cnt == kInternalCardinality;
   Key split_key;
   GlobalAddress sibling_addr;
+  // THe internal node is different from leaf nodes because it has the
+  // leftmost_ptr. THe internal nodes has n key but n+1 global pointers.
   if (need_split) { // need split
     sibling_addr = dsm->alloc(kInternalPageSize);
     auto sibling_buf = rbuf.get_sibling_buffer();
@@ -851,9 +853,10 @@ void Tree::internal_page_store(GlobalAddress page_addr, const Key &k,
           sibling->records[i - m - 1].key = page->records[i].key;
           sibling->records[i - m - 1].ptr = page->records[i].ptr;
       }
-      page->hdr.last_index -= (cnt - m);
+      page->hdr.last_index -= (cnt - m); // this is correct.
+      assert(page->hdr.last_index == m-1);
       sibling->hdr.last_index += (cnt - m - 1);
-
+      assert(page->hdr.last_index == cnt - m - 1 - 1);
       sibling->hdr.leftmost_ptr = page->records[m].ptr;
       sibling->hdr.lowest = page->records[m].key;
       sibling->hdr.highest = page->hdr.highest;
@@ -957,6 +960,8 @@ bool Tree::leaf_page_store(GlobalAddress page_addr, const Key &k,
   int cnt = 0;
   int empty_index = -1;
   char *update_addr = nullptr;
+    // It is problematic to just check whether the value is empty, because it is possible
+    // that the buffer is not initialized as 0
   for (int i = 0; i < kLeafCardinality; ++i) {
 
     auto &r = page->records[i];
@@ -1031,8 +1036,9 @@ bool Tree::leaf_page_store(GlobalAddress page_addr, const Key &k,
           page->records[i].value = kValueNull;
       }
       page->hdr.last_index -= (cnt - m);
+      assert(page->hdr.last_index == m-1);
       sibling->hdr.last_index += (cnt - m);
-
+      assert(sibling->hdr.last_index == cnt -m -1);
       sibling->hdr.lowest = split_key;
       sibling->hdr.highest = page->hdr.highest;
       page->hdr.highest = split_key;

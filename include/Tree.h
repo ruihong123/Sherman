@@ -148,6 +148,8 @@ private:
   GlobalAddress leftmost_ptr;
   GlobalAddress sibling_ptr;
   uint8_t level;
+  // the last index is initialized as -1 in leaf node and internal nodes,
+  // only 0 in the root node.
   int16_t last_index;
   Key lowest;
   Key highest;
@@ -202,8 +204,8 @@ public:
     f_version = 0;
     r_version = 0;
     value = kValueNull;
-//    key = 0;
-      key = {};
+    key = 0;
+//      key = {};
   }
 } __attribute__((packed));
 

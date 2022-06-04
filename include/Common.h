@@ -129,8 +129,8 @@ using Value = uint64_t;
 //using Value = Value_buff;
 constexpr Key kKeyMin = std::numeric_limits<Key>::min();
 constexpr Key kKeyMax = std::numeric_limits<Key>::max();
-//constexpr Value kValueNull = 0;
-constexpr Value kValueNull = {};
+constexpr Value kValueNull = 0;
+//constexpr Value kValueNull = {};
 //constexpr uint32_t kInternalPageSize = 1024;
 //constexpr uint32_t kLeafPageSize = 1024;
 
