@@ -682,11 +682,11 @@ re_read:
     }
     leaf_page_search(page, k, result);
   } else {
-      assert(((InternalPage*)page_buffer)->records[((InternalPage*)page_buffer)->hdr.last_index].ptr != GlobalAddress::Null());
 
       assert(result.level != 0);
     assert(!from_cache);
     auto page = (InternalPage *)page_buffer;
+      assert(page->records[page->hdr.last_index].ptr != GlobalAddress::Null());
 
     if (!page->check_consistent()) {
       goto re_read;
