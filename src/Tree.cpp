@@ -738,7 +738,7 @@ void Tree::internal_page_search(InternalPage *page, const Key &k,
 //        printf("next level key is %lu \n", page->records[i - 1].key);
       result.next_level = page->records[i - 1].ptr;
         assert(result.next_level != GlobalAddress::Null());
-        assert(page->records[i - 1].key < k);
+        assert(page->records[i - 1].key <= k);
 
       return;
     }
