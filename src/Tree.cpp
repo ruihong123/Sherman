@@ -747,7 +747,7 @@ void Tree::internal_page_search(InternalPage *page, const Key &k,
 
     result.next_level = page->records[cnt - 1].ptr;
     assert(result.next_level != GlobalAddress::Null());
-    assert(page->records[cnt - 1].key < k);
+    assert(page->records[cnt - 1].key <= k);
 }
 
 void Tree::leaf_page_search(LeafPage *page, const Key &k,
