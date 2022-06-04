@@ -1016,8 +1016,10 @@ bool Tree::leaf_page_store(GlobalAddress page_addr, const Key &k,
     // (int)(page->hdr.level) << std::endl;
 
     int m = cnt / 2;
+    //NOte the split leaf is the former split node's highest key, that the split key will
+    // be pointed to the new node
     split_key = page->records[m].key;
-    assert(split_key > page->hdr.lowest);
+//    assert(split_key > page->hdr.lowest);// no way if there isonly two entries
     assert(split_key < page->hdr.highest);
       page->hdr.last_index -= (cnt - m);
       sibling->hdr.last_index += (cnt - m);
