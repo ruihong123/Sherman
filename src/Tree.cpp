@@ -734,7 +734,7 @@ void Tree::internal_page_search(InternalPage *page, const Key &k,
 
   for (int i = 1; i < cnt; ++i) {
     if (k < page->records[i].key) {
-//        printf("next level pointer is %p \n", page->records[i - 1].ptr);
+        printf("next level pointer is %p \n", page->records[i - 1].ptr);
       result.next_level = page->records[i - 1].ptr;
         assert(result.next_level != GlobalAddress::Null());
       return;
@@ -1036,7 +1036,6 @@ bool Tree::leaf_page_store(GlobalAddress page_addr, const Key &k,
       // link
       sibling->hdr.sibling_ptr = page->hdr.sibling_ptr;
       page->hdr.sibling_ptr = sibling_addr;
-
     sibling->set_consistent();
     dsm->write_sync(sibling_buf, sibling_addr, kLeafPageSize, cxt);
   }
@@ -1059,6 +1058,7 @@ bool Tree::leaf_page_store(GlobalAddress page_addr, const Key &k,
   auto up_level = path_stack[coro_id][level + 1];
 
   if (up_level != GlobalAddress::Null()) {
+
     internal_page_store(up_level, split_key, sibling_addr, root, level + 1, cxt,
                         coro_id);
   } else {
