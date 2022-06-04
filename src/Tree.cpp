@@ -805,7 +805,7 @@ void Tree::internal_page_store(GlobalAddress page_addr, const Key &k,
   assert(k >= page->hdr.lowest);
 
   auto cnt = page->hdr.last_index + 1;
-
+  assert(page->records[page->hdr.last_index].ptr != GlobalAddress::Null());
   bool is_update = false;
   uint16_t insert_index = 0;
   for (int i = cnt - 1; i >= 0; --i) {
@@ -820,7 +820,6 @@ void Tree::internal_page_store(GlobalAddress page_addr, const Key &k,
       break;
     }
   }
-
   assert(cnt != kInternalCardinality);
 
   if (!is_update) { // insert and shift
