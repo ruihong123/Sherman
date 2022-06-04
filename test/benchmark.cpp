@@ -111,8 +111,8 @@ void thread_run(int id) {
   //kWarmRatio *
   for (uint64_t i = 1; i < end_warm_key; ++i) {
     if (i % all_thread == my_id) {
-//      tree->insert(i, i * 2);
-        tree->insert(to_key(i), i * 2);
+      tree->insert(i, i * 2);
+//        tree->insert(to_key(i), i * 2);
     }
       if (i % 1000000 == 0 && id == 0){
           printf("warm up number: %lu\r", i);
@@ -292,6 +292,7 @@ int main(int argc, char *argv[]) {
     for (uint64_t i = 1; i < 1024000; ++i) {
 //        printf("insert key %d", i);
       tree->insert(to_key(i), i * 2);
+        tree->insert(i, i * 2);
     }
   }
 #endif
