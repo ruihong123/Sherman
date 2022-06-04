@@ -152,11 +152,13 @@ bool Tree::update_new_root(GlobalAddress left, const Key &k,
 
   auto page_buffer = dsm->get_rbuf(coro_id).get_page_buffer();
   auto cas_buffer = dsm->get_rbuf(coro_id).get_cas_buffer();
+    assert(left != GlobalAddress::Null());
+    assert(right != GlobalAddress::Null());
   auto new_root = new (page_buffer) InternalPage(left, k, right, level);
 
   auto new_root_addr = dsm->alloc(kInternalPageSize);
   // The code below is just for debugging
-    new_root_addr.val = 3;
+//    new_root_addr.val = 3;
   new_root->set_consistent();
   dsm->write_sync(page_buffer, new_root_addr, kInternalPageSize, cxt);
   if (dsm->cas_sync(root_ptr_ptr, old_root, new_root_addr, cas_buffer, cxt)) {
