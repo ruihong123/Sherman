@@ -1022,7 +1022,7 @@ bool Tree::leaf_page_store(GlobalAddress page_addr, const Key &k,
       page->hdr.last_index -= (cnt - m);
       sibling->hdr.last_index += (cnt - m);
 
-      sibling->hdr.lowest = split_key;
+      sibling->hdr.lowest = page->records[m-1].key;
       sibling->hdr.highest = page->hdr.highest;
       page->hdr.highest = page->records[m-1].key;
 //    page->hdr.highest = split_key;// this is problematic.
