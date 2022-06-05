@@ -421,7 +421,7 @@ void Tree::insert(const Key &k, const Value &v, CoroContext *cxt, int coro_id) {
       // cache stale, from root,
       index_cache->invalidate(entry);
         cache_invalid_counter.fetch_add(1);
-        if(cache_invalid_counter.load() == 1000){
+        if(cache_invalid_counter.load() == 5000){
             printf("Invalidate cache\n");
             cache_invalid_counter.store(0);
         }
@@ -495,7 +495,7 @@ next:
       index_cache->invalidate(entry);
       // Comment it during the test.
         cache_invalid_counter.fetch_add(1);
-        if(cache_invalid_counter.load() == 1000){
+        if(cache_invalid_counter.load() == 5000){
             printf("Invalidate cache\n");
             cache_invalid_counter.store(0);
         }
