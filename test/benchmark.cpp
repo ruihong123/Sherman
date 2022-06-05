@@ -322,9 +322,9 @@ int main(int argc, char *argv[]) {
 
   int count = 0;
 
-
+  clock_gettime(CLOCK_REALTIME, &s);
   while (true) {
-    clock_gettime(CLOCK_REALTIME, &s);
+      // throutput every 10 second
     sleep(10);
     clock_gettime(CLOCK_REALTIME, &e);
     int microseconds = (e.tv_sec - s.tv_sec) * 1000000 +
@@ -333,7 +333,7 @@ int main(int argc, char *argv[]) {
     uint64_t all_tp = 0;
     for (int i = 0; i < kThreadCount; ++i) {
       all_tp += tp[i][0];
-      tp[i][0] = 0;
+//      tp[i][0] = 0;
     }
     uint64_t cap = all_tp - pre_tp;
     pre_tp = all_tp;
