@@ -19,7 +19,7 @@ const int kTthreadUpper = 23;
 
 extern uint64_t cache_miss[MAX_APP_THREAD][8];
 extern uint64_t cache_hit[MAX_APP_THREAD][8];
-extern uint64_t valid_cache_hit[MAX_APP_THREAD][8];
+extern uint64_t invalid_counter[MAX_APP_THREAD][8];
 extern uint64_t lock_fail[MAX_APP_THREAD][8];
 extern uint64_t pattern[MAX_APP_THREAD][8];
 extern uint64_t hot_filter_count[MAX_APP_THREAD][8];
@@ -348,7 +348,7 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < MAX_APP_THREAD; ++i) {
       all += (cache_hit[i][0] + cache_miss[i][0]);
       hit += cache_hit[i][0];
-      realhit += valid_cache_hit[i][0];
+      realhit += invalid_counter[i][0];
     }
 
     uint64_t fail_locks_cnt = 0;
@@ -407,9 +407,8 @@ int main(int argc, char *argv[]) {
       // printf("WE %.3f HO %.3f\n", cluster_we * 1000000ull / 1.0 /
       // microseconds,
       //        cluster_ho * 1000000ull / 1.0 / microseconds);
-
+        // this is the real cache hit ratge
       printf("cache hit rate: %lf\n", hit * 1.0 / all);
-        printf("real cache hit rate: %lf\n", realhit * 1.0 / all);
       // printf("ACCESS PATTERN");
       // for (int i = 0; i < 8; ++i) {
       //   printf("\t%ld", pp[i]);

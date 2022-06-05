@@ -16,7 +16,7 @@ bool enter_debug = false;
 HotBuffer hot_buf;
 uint64_t cache_miss[MAX_APP_THREAD][8];
 uint64_t cache_hit[MAX_APP_THREAD][8];
-uint64_t valid_cache_hit[MAX_APP_THREAD][8];
+uint64_t invalid_counter[MAX_APP_THREAD][8];
 uint64_t lock_fail[MAX_APP_THREAD][8];
 uint64_t pattern[MAX_APP_THREAD][8];
 uint64_t hierarchy_lock[MAX_APP_THREAD][8];
@@ -416,15 +416,15 @@ void Tree::insert(const Key &k, const Value &v, CoroContext *cxt, int coro_id) {
 //        if (res == HotResult::SUCC) {
 //          hot_buf.clear(k);
 //        }
-          valid_cache_hit[dsm->getMyThreadID()][0]++;
-          if(valid_cache_hit[dsm->getMyThreadID()][0] % 5000 == 0){
-              printf("Invalidate cache\n");
-          }
+
         return;
       }
       // cache stale, from root,
       index_cache->invalidate(entry);
-
+//        invalid_counter[dsm->getMyThreadID()][1]++;
+//        if(invalid_counter[dsm->getMyThreadID()][1] % 5000 == 0){
+//            printf("Invalidate cache 1\n");
+//        }
 //        printf("Invalidate cache\n");
     }
     cache_miss[dsm->getMyThreadID()][0]++;
@@ -494,7 +494,11 @@ next:
     if (from_cache) { // cache stale
       index_cache->invalidate(entry);
       // Comment it during the test.
-
+//        invalid_counter[dsm->getMyThreadID()][0]++;
+//        if(invalid_counter[dsm->getMyThreadID()][0] % 5000 == 0){
+//            printf("Invalidate cache 0\n");
+//        }
+        //The cache hit is the real cache hit counting the invalidation in
       cache_hit[dsm->getMyThreadID()][0]--;
       cache_miss[dsm->getMyThreadID()][0]++;
       from_cache = false;
@@ -505,16 +509,6 @@ next:
       sleep(1);
     }
     goto next;
-  }
-  // Can comment it during the test.
-  else{
-      if (from_cache){
-          valid_cache_hit[dsm->getMyThreadID()][0]++;
-          if(valid_cache_hit[dsm->getMyThreadID()][0] % 5000 == 0){
-              printf("Invalidate cache\n");
-          }
-
-      }
   }
   if (result.is_leaf) {
     if (result.val != kValueNull) { // find
