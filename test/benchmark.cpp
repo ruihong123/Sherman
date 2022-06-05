@@ -345,11 +345,11 @@ int main(int argc, char *argv[]) {
 
     uint64_t all = 0;
     uint64_t hit = 0;
-    uint64_t realhit = 0;
+//    uint64_t realhit = 0;
     for (int i = 0; i < MAX_APP_THREAD; ++i) {
       all += (cache_hit[i][0] + cache_miss[i][0]);
       hit += cache_hit[i][0];
-      realhit += invalid_counter[i][0];
+//      realhit += invalid_counter[i][0];
     }
 
     uint64_t fail_locks_cnt = 0;
