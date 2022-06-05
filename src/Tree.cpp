@@ -655,6 +655,8 @@ re_read:
   memset(&result, 0, sizeof(result));
   result.is_leaf = header->leftmost_ptr == GlobalAddress::Null();
   result.level = header->level;
+  if(!result.is_leaf)
+      assert(result.level !=0);
   path_stack[coro_id][result.level] = page_addr;
   // std::cout << "level " << (int)result.level << " " << page_addr <<
   // std::endl;
