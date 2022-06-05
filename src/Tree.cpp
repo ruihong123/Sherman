@@ -16,6 +16,7 @@ bool enter_debug = false;
 HotBuffer hot_buf;
 uint64_t cache_miss[MAX_APP_THREAD][8];
 uint64_t cache_hit[MAX_APP_THREAD][8];
+uint64_t valid_cache_hit[MAX_APP_THREAD][8];
 uint64_t lock_fail[MAX_APP_THREAD][8];
 uint64_t pattern[MAX_APP_THREAD][8];
 uint64_t hierarchy_lock[MAX_APP_THREAD][8];
@@ -43,7 +44,7 @@ thread_local Timer timer;
 thread_local std::queue<uint16_t> hot_wait_queue;
 thread_local std::priority_queue<CoroDeadline> deadline_queue;
 
-Tree::Tree(DSM *dsm, uint16_t tree_id) : dsm(dsm), tree_id(tree_id),cache_invalid_counter(0) {
+Tree::Tree(DSM *dsm, uint16_t tree_id) : dsm(dsm), tree_id(tree_id){
 
   for (int i = 0; i < dsm->getClusterSize(); ++i) {
     local_locks[i] = new LocalLockNode[define::kNumOfLock];
@@ -415,16 +416,15 @@ void Tree::insert(const Key &k, const Value &v, CoroContext *cxt, int coro_id) {
 //        if (res == HotResult::SUCC) {
 //          hot_buf.clear(k);
 //        }
-        //Why we can return here?
+          valid_cache_hit[dsm->getMyThreadID()][0]++;
+          if(valid_cache_hit[dsm->getMyThreadID()][0] % 5000 == 0){
+              printf("Invalidate cache\n");
+          }
         return;
       }
       // cache stale, from root,
       index_cache->invalidate(entry);
-        cache_invalid_counter.fetch_add(1);
-        if(cache_invalid_counter.load() == 5000){
-            printf("Invalidate cache\n");
-            cache_invalid_counter.store(0);
-        }
+
 //        printf("Invalidate cache\n");
     }
     cache_miss[dsm->getMyThreadID()][0]++;
@@ -494,11 +494,6 @@ next:
     if (from_cache) { // cache stale
       index_cache->invalidate(entry);
       // Comment it during the test.
-        cache_invalid_counter.fetch_add(1);
-        if(cache_invalid_counter.load() == 5000){
-            printf("Invalidate cache\n");
-            cache_invalid_counter.store(0);
-        }
 
       cache_hit[dsm->getMyThreadID()][0]--;
       cache_miss[dsm->getMyThreadID()][0]++;
@@ -510,6 +505,16 @@ next:
       sleep(1);
     }
     goto next;
+  }
+  // Can comment it during the test.
+  else{
+      if (from_cache){
+          valid_cache_hit[dsm->getMyThreadID()][0]++;
+          if(valid_cache_hit[dsm->getMyThreadID()][0] % 5000 == 0){
+              printf("Invalidate cache\n");
+          }
+
+      }
   }
   if (result.is_leaf) {
     if (result.val != kValueNull) { // find

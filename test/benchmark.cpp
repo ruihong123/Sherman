@@ -19,6 +19,7 @@ const int kTthreadUpper = 23;
 
 extern uint64_t cache_miss[MAX_APP_THREAD][8];
 extern uint64_t cache_hit[MAX_APP_THREAD][8];
+extern uint64_t valid_cache_hit[MAX_APP_THREAD][8];
 extern uint64_t lock_fail[MAX_APP_THREAD][8];
 extern uint64_t pattern[MAX_APP_THREAD][8];
 extern uint64_t hot_filter_count[MAX_APP_THREAD][8];
@@ -108,8 +109,8 @@ void thread_run(int id) {
   }
 
   uint64_t end_warm_key = kKeySpace;
-  //
-  for (uint64_t i = 1; i < kWarmRatio * end_warm_key; ++i) {
+  //kWarmRatio *
+  for (uint64_t i = 1; i < end_warm_key; ++i) {
       // we can not sequentially pop up the data. Otherwise there will be a bug.
       if (i % all_thread == my_id) {
 //      tree->insert(i, i * 2);
@@ -343,9 +344,11 @@ int main(int argc, char *argv[]) {
 
     uint64_t all = 0;
     uint64_t hit = 0;
+    uint64_t realhit = 0;
     for (int i = 0; i < MAX_APP_THREAD; ++i) {
       all += (cache_hit[i][0] + cache_miss[i][0]);
       hit += cache_hit[i][0];
+      realhit += valid_cache_hit[i][0];
     }
 
     uint64_t fail_locks_cnt = 0;
@@ -406,6 +409,7 @@ int main(int argc, char *argv[]) {
       //        cluster_ho * 1000000ull / 1.0 / microseconds);
 
       printf("cache hit rate: %lf\n", hit * 1.0 / all);
+        printf("real cache hit rate: %lf\n", realhit * 1.0 / all);
       // printf("ACCESS PATTERN");
       // for (int i = 0; i < 8; ++i) {
       //   printf("\t%ld", pp[i]);
