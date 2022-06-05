@@ -108,11 +108,13 @@ void thread_run(int id) {
   }
 
   uint64_t end_warm_key = kKeySpace;
-  //kWarmRatio *
-  for (uint64_t i = 1; i < end_warm_key; ++i) {
+  //
+  for (uint64_t i = 1; i < kWarmRatio * end_warm_key; ++i) {
     if (i % all_thread == my_id) {
 //      tree->insert(i, i * 2);
-        tree->insert(to_key(i), i * 2);
+//        tree->insert(to_key(i), i * 2);
+        tree->insert(rand.Next()%(kKeySpace), i * 2);
+
     }
       if (i % 1000000 == 0 && id == 0){
           printf("warm up number: %lu\r", i);
@@ -164,9 +166,9 @@ void thread_run(int id) {
         ;
     }
     // the dis range is [0, 64M]
-    uint64_t dis = mehcached_zipf_next(&state);
-//    uint64_t key = rand.Next()%(kKeySpace);
-    uint64_t key = to_key(dis);
+//    uint64_t dis = mehcached_zipf_next(&state);
+    uint64_t key = rand.Next()%(kKeySpace);
+//    uint64_t key = to_key(dis);
 
     Value v;
 
