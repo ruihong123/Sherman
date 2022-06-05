@@ -43,7 +43,7 @@ thread_local Timer timer;
 thread_local std::queue<uint16_t> hot_wait_queue;
 thread_local std::priority_queue<CoroDeadline> deadline_queue;
 
-Tree::Tree(DSM *dsm, uint16_t tree_id) : dsm(dsm), tree_id(tree_id) {
+Tree::Tree(DSM *dsm, uint16_t tree_id) : dsm(dsm), tree_id(tree_id),cache_invalid_counter(0) {
 
   for (int i = 0; i < dsm->getClusterSize(); ++i) {
     local_locks[i] = new LocalLockNode[define::kNumOfLock];
@@ -420,6 +420,11 @@ void Tree::insert(const Key &k, const Value &v, CoroContext *cxt, int coro_id) {
       }
       // cache stale, from root,
       index_cache->invalidate(entry);
+        cache_invalid_counter.fetch_add(1);
+        if(cache_invalid_counter.load() == 1000){
+            printf("Invalidate cache\n");
+            cache_invalid_counter.store(0);
+        }
 //        printf("Invalidate cache\n");
     }
     cache_miss[dsm->getMyThreadID()][0]++;
@@ -488,7 +493,13 @@ next:
   if (!page_search(p, k, result, cxt, coro_id, from_cache)) {
     if (from_cache) { // cache stale
       index_cache->invalidate(entry);
-//        printf("Invalidate cache\n");
+      // Comment it during the test.
+        cache_invalid_counter.fetch_add(1);
+        if(cache_invalid_counter.load() == 1000){
+            printf("Invalidate cache\n");
+            cache_invalid_counter.store(0);
+        }
+
       cache_hit[dsm->getMyThreadID()][0]--;
       cache_miss[dsm->getMyThreadID()][0]++;
       from_cache = false;

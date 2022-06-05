@@ -110,10 +110,11 @@ void thread_run(int id) {
   uint64_t end_warm_key = kKeySpace;
   //
   for (uint64_t i = 1; i < kWarmRatio * end_warm_key; ++i) {
-    if (i % all_thread == my_id) {
+      // we can not sequentially pop up the data. Otherwise there will be a bug.
+      if (i % all_thread == my_id) {
 //      tree->insert(i, i * 2);
-//        tree->insert(to_key(i), i * 2);
-        tree->insert(rand.Next()%(kKeySpace), i * 2);
+        tree->insert(to_key(i), i * 2);
+//        tree->insert(rand.Next()%(kKeySpace), i * 2);
 
     }
       if (i % 1000000 == 0 && id == 0){

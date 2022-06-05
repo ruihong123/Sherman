@@ -84,7 +84,7 @@ private:
   LocalLockNode *local_locks[MAX_MACHINE];
 
   IndexCache *index_cache;
-
+    std::atomic<int> cache_invalid_counter;
   void print_verbose();
 
   void before_operation(CoroContext *cxt, int coro_id);
