@@ -198,7 +198,7 @@ inline GlobalAddress DSM::alloc(size_t size) {
       (getMyThreadID() + getMyNodeID()) % conf.MemoryNodeNum;
   thread_local int next_target_dir_id =
       (getMyThreadID() + getMyNodeID()) % NR_DIRECTORY;
-    printf("Allocate a new page");
+//    printf("Allocate a new page");
   bool need_chunk = false;
   auto addr = local_allocator.malloc(size, need_chunk);
   if (need_chunk) {
