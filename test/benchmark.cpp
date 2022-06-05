@@ -33,8 +33,8 @@ int kThreadCount;
 int kComputeNodeCount;
 int kMemoryNodeCount;
 //uint64_t kKeySpace = 64 * define::MB;
-//uint64_t kKeySpace = 100*1000*1000; // bigdata
-uint64_t kKeySpace = 50*1000*1000; //cloudlab
+uint64_t kKeySpace = 100*1000*1000; // bigdata
+//uint64_t kKeySpace = 50*1000*1000; //cloudlab
 double kWarmRatio = 0.8;
 
 double zipfan = 0;
@@ -322,10 +322,10 @@ int main(int argc, char *argv[]) {
 
   int count = 0;
 
-  clock_gettime(CLOCK_REALTIME, &s);
-  while (true) {
 
-    sleep(2);
+  while (true) {
+    clock_gettime(CLOCK_REALTIME, &s);
+    sleep(10);
     clock_gettime(CLOCK_REALTIME, &e);
     int microseconds = (e.tv_sec - s.tv_sec) * 1000000 +
                        (double)(e.tv_nsec - s.tv_nsec) / 1000;
@@ -333,6 +333,7 @@ int main(int argc, char *argv[]) {
     uint64_t all_tp = 0;
     for (int i = 0; i < kThreadCount; ++i) {
       all_tp += tp[i][0];
+      tp[i][0] = 0;
     }
     uint64_t cap = all_tp - pre_tp;
     pre_tp = all_tp;
@@ -349,6 +350,9 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < MAX_APP_THREAD; ++i) {
       all += (cache_hit[i][0] + cache_miss[i][0]);
       hit += cache_hit[i][0];
+      //May be we need atomic variable here.
+        cache_hit[i][0] = 0;
+        cache_miss[i][0] = 0;
 //      realhit += invalid_counter[i][0];
     }
 
