@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.5 FATAL_ERROR)
 project(Sherman)
-
+# testable bug buggy version.
 # set (CMAKE_C_COMPILER "/usr/local/openmpi/bin/mpicxx")
 # set (CMAKE_CXX_COMPILER ${CMAKE_C_COMPILER})
 
