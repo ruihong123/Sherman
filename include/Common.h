@@ -49,9 +49,9 @@
 
 #define DIR_MESSAGE_NR 128
 
-#define kInternalPageSize 4096
+#define kInternalPageSize 1024
 
-#define kLeafPageSize 4096
+#define kLeafPageSize 1024
 
 #define KEY_PADDING 12
 
@@ -108,7 +108,7 @@ constexpr int64_t kPerCoroRdmaBuf = 128 * 1024;
 
 constexpr uint8_t kMaxHandOverTime = 8;
 
-constexpr int kIndexCacheSize = 16000; // MB
+constexpr int kIndexCacheSize = 32000; // MB
 } // namespace define
 
 static inline unsigned long long asm_rdtsc(void) {
