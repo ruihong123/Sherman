@@ -6,9 +6,10 @@ int kReadRatio;
 int kThreadCount;
 int kComputeNodeCount;
 int kMemoryNodeCount;
+bool table_scan;
 void parse_args(int argc, char *argv[]) {
-    if (argc != 5) {
-        printf("Usage: ./benchmark kComputeNodeCount kReadRatio kThreadCount\n");
+    if (argc != 6) {
+        printf("Usage: ./benchmark kComputeNodeCount kMemoryNodeCount kReadRatio kThreadCount tablescan\n");
         exit(-1);
     }
 
@@ -16,9 +17,14 @@ void parse_args(int argc, char *argv[]) {
     kMemoryNodeCount = atoi(argv[2]);
     kReadRatio = atoi(argv[3]);
     kThreadCount = atoi(argv[4]);
+    int scan_number = atoi(argv[5]);
+    if(scan_number == 0)
+        table_scan = false;
+    else
+        table_scan = true;
 
-    printf("kComputeNodeCount %d, kReadRatio %d, kThreadCount %d\n", kComputeNodeCount,
-           kReadRatio, kThreadCount);
+    printf("kComputeNodeCount %d, kMemoryNodeCount %d, kReadRatio %d, kThreadCount %d, tablescan %d\n", kComputeNodeCount,
+           kMemoryNodeCount, kReadRatio, kThreadCount, scan_number);
 }
 int main(int argc,char* argv[])
 {
