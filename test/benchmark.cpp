@@ -33,7 +33,7 @@ int kThreadCount;
 int kComputeNodeCount;
 int kMemoryNodeCount;
 //uint64_t kKeySpace = 64 * define::MB;
-uint64_t kKeySpace = 100*1000*1000; // bigdata
+uint64_t kKeySpace = 50*1000*1000; // bigdata
 //uint64_t kKeySpace = 50*1000*1000; //cloudlab
 double kWarmRatio = 0.8;
 
