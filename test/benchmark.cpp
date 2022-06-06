@@ -33,6 +33,7 @@ int kThreadCount;
 int kComputeNodeCount;
 int kMemoryNodeCount;
 bool table_scan = false;
+bool use_range_query = false;
 
 //uint64_t kKeySpace = 64 * define::MB;
 uint64_t kKeySpace = 50*1024*1024; // bigdata
@@ -125,6 +126,18 @@ void thread_run(int id) {
           printf("warm up number: %lu\r", i);
       }
   }
+    if (table_scan){
+        for (uint64_t i = 1; i < end_warm_key; ++i) {
+            // we can not sequentially pop up the data. Otherwise there will be a bug.
+            if (i % all_thread == my_id) {
+                Value v;
+                tree->search(to_key(i),v);
+            }
+            if (i % 1000000 == 0 ){
+                printf("cache warm up number: %lu\r", i);
+            }
+        }
+    }
 
   warmup_cnt.fetch_add(1);
 
@@ -188,10 +201,19 @@ void thread_run(int id) {
     tree->lock_bench(key);
 #else
       if (table_scan){
-          tree->range_query(scan_pos, scan_pos + 1000*1000, value_buffer);
-          scan_pos += 1000*1000;
-          if(scan_pos > kKeySpace)
-              break;
+          if (use_range_query){
+              tree->range_query(scan_pos, scan_pos + 1000*1000, value_buffer);
+              scan_pos += 1000*1000;
+              if(scan_pos > kKeySpace)
+                  break;
+          }else{
+              tree->search(scan_pos,v);
+              scan_pos++;
+              if(scan_pos > kKeySpace)
+                  break;
+          }
+
+
       }
 
 
@@ -220,7 +242,7 @@ void thread_run(int id) {
       us_10 = LATENCY_WINDOWS - 1;
     }
     latency[id][us_10]++;
-      if (table_scan){
+      if (table_scan&&use_range_query){
           tp[id][0] += 1000*1000;
       }else{
           tp[id][0]++;

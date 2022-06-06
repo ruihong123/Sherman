@@ -8,7 +8,7 @@ int kComputeNodeCount;
 int kMemoryNodeCount;
 bool table_scan;
 void parse_args(int argc, char *argv[]) {
-    if (argc != 6) {
+    if (argc < 5) {
         printf("Usage: ./benchmark kComputeNodeCount kMemoryNodeCount kReadRatio kThreadCount tablescan\n");
         exit(-1);
     }
