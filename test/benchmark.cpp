@@ -232,7 +232,7 @@ void thread_run(int id) {
 }
 
 void parse_args(int argc, char *argv[]) {
-  if (argc != 5) {
+  if (argc != 6) {
     printf("Usage: ./benchmark kComputeNodeCount kMemoryNodeCount kReadRatio kThreadCount tablescan\n");
     exit(-1);
   }
@@ -241,14 +241,14 @@ void parse_args(int argc, char *argv[]) {
     kMemoryNodeCount = atoi(argv[2]);
     kReadRatio = atoi(argv[3]);
     kThreadCount = atoi(argv[4]);
-    int number = atoi(argv[5]);
-    if(number == 0)
+    int scan_number = atoi(argv[5]);
+    if(scan_number == 0)
         table_scan = false;
     else
         table_scan = true;
 
-    printf("kComputeNodeCount %d, kMemoryNodeCount %d, kReadRatio %d, kThreadCount %d\n", kComputeNodeCount,
-         kMemoryNodeCount, kReadRatio, kThreadCount);
+    printf("kComputeNodeCount %d, kMemoryNodeCount %d, kReadRatio %d, kThreadCount %d, tablescan %d\n", kComputeNodeCount,
+           kMemoryNodeCount, kReadRatio, kThreadCount, scan_number);
 }
 
 void cal_latency() {
