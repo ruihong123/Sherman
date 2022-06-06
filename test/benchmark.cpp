@@ -32,9 +32,11 @@ int kReadRatio;
 int kThreadCount;
 int kComputeNodeCount;
 int kMemoryNodeCount;
+bool table_scan = false;
+
 //uint64_t kKeySpace = 64 * define::MB;
-uint64_t kKeySpace = 50*1000*1000; // bigdata
-//uint64_t kKeySpace = 50*1000*1000; //cloudlab
+uint64_t kKeySpace = 50*1024*1024; // bigdata
+//uint64_t kKeySpace = 50*1024*1024; //cloudlab
 double kWarmRatio = 0.8;
 
 double zipfan = 0;
@@ -119,7 +121,7 @@ void thread_run(int id) {
 //        tree->insert(rand.Next()%(kKeySpace), i * 2);
 
     }
-      if (i % 100000 == 0 && id == 0){
+      if (i % 1000000 == 0 ){
           printf("warm up number: %lu\r", i);
       }
   }
@@ -162,6 +164,7 @@ void thread_run(int id) {
   Timer timer;
   Value *value_buffer = (Value *)malloc(sizeof(Value) * 1024 * 1024);
   int print_counter = 0;
+  uint64_t scan_pos = 0;
   while (true) {
 
     if (need_stop || id >= kTthreadUpper) {
@@ -184,6 +187,13 @@ void thread_run(int id) {
     }
     tree->lock_bench(key);
 #else
+      if (table_scan){
+          tree->range_query(scan_pos, scan_pos + 1000*1000, value_buffer);
+          scan_pos += 1000*1000;
+          if(scan_pos > kKeySpace)
+              break;
+      }
+
 
     if (rand_r(&seed) % 100 < kReadRatio) { // GET
 //        printf("Get one key");
@@ -210,8 +220,12 @@ void thread_run(int id) {
       us_10 = LATENCY_WINDOWS - 1;
     }
     latency[id][us_10]++;
+      if (table_scan){
+          tp[id][0] += 1000*1000;
+      }else{
+          tp[id][0]++;
+      }
 
-    tp[id][0]++;
   }
 
 #endif
@@ -219,7 +233,7 @@ void thread_run(int id) {
 
 void parse_args(int argc, char *argv[]) {
   if (argc != 5) {
-    printf("Usage: ./benchmark kComputeNodeCount kMemoryNodeCount kReadRatio kThreadCount\n");
+    printf("Usage: ./benchmark kComputeNodeCount kMemoryNodeCount kReadRatio kThreadCount tablescan\n");
     exit(-1);
   }
 
@@ -227,7 +241,13 @@ void parse_args(int argc, char *argv[]) {
     kMemoryNodeCount = atoi(argv[2]);
     kReadRatio = atoi(argv[3]);
     kThreadCount = atoi(argv[4]);
-  printf("kComputeNodeCount %d, kMemoryNodeCount %d, kReadRatio %d, kThreadCount %d\n", kComputeNodeCount,
+    int number = atoi(argv[5]);
+    if(number == 0)
+        table_scan = false;
+    else
+        table_scan = true;
+
+    printf("kComputeNodeCount %d, kMemoryNodeCount %d, kReadRatio %d, kThreadCount %d\n", kComputeNodeCount,
          kMemoryNodeCount, kReadRatio, kThreadCount);
 }
 
