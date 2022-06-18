@@ -256,7 +256,7 @@ inline bool Tree::try_lock_addr(GlobalAddress lock_addr, uint64_t tag,
     }
 
     bool res = dsm->cas_dm_sync(lock_addr, 0, tag, buf, cxt);
-
+      std::cout << "lock address " << lock_addr << std::endl;
     pattern_cnt++;
     if (!res) {
       conflict_tag = *buf - 1;
@@ -283,7 +283,7 @@ inline void Tree::unlock_addr(GlobalAddress lock_addr, uint64_t tag,
   }
 
   auto cas_buf = dsm->get_rbuf(coro_id).get_cas_buffer();
-
+    std::cout << "unlock " << lock_addr << std::endl;
   *cas_buf = 0;
   if (async) {
     dsm->write_dm((char *)cas_buf, lock_addr, sizeof(uint64_t), false);
