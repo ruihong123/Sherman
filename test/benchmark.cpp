@@ -121,7 +121,7 @@ void thread_run(int id) {
         tree->insert(to_key(i), i * 2);
 //        tree->insert(rand.Next()%(kKeySpace), i * 2);
 
-    }
+        }
       if (i % 1000000 == 0 ){
           printf("warm up number: %lu\r", i);
       }

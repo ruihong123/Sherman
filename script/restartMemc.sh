@@ -21,3 +21,4 @@ echo -e "delete 0C-0M\r\nquit\r" | nc ${addr} ${port}
 echo -e "delete 1C-0M\r\nquit\r" | nc ${addr} ${port}
 echo -e "delete 0C-1M\r\nquit\r" | nc ${addr} ${port}
 echo -e "delete 1C-1M\r\nquit\r" | nc ${addr} ${port}
+echo -e "delete barrier-benchmark\r\nquit\r" | nc ${addr} ${port}

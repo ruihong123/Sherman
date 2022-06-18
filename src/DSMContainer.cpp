@@ -73,7 +73,7 @@ void DSMContainer::serverEnter() {
 
             myNodeID = serverNum - 1;
 
-            printf("I am servers %d [%s]\n", myNodeID, getIP());
+            printf("I am memory servers %d [%s]\n", myNodeID, getIP());
             return;
         }
         fprintf(stderr, "Server %d Counld't incr value and get ID: %s, retry...\n",
@@ -102,7 +102,7 @@ void DSMContainer::serverConnect() {
         for (size_t k = curServer; k < serverNum; ++k) {
 //            if (k != myNodeID) {
                 connectNode(k);
-                printf("I connect server %zu\n", k);
+                printf("I connect compute server %zu\n", k);
 //            }
         }
         curServer = serverNum;
