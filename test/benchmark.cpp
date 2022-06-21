@@ -122,8 +122,8 @@ void thread_run(int id) {
 //        tree->insert(rand.Next()%(kKeySpace), i * 2);
 
         }
-      if (i % 1000000 == 0 ){
-          printf("warm up number: %lu\r", i);
+      if (i % 4000000 == 0 ){
+          printf("warm up number: %lu\n", i);
       }
   }
     if (table_scan){

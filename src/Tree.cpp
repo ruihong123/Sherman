@@ -1272,17 +1272,19 @@ inline bool Tree::can_hand_over(GlobalAddress lock_addr) {
 
   auto &node = local_locks[lock_addr.nodeID][lock_addr.offset / 8];
   uint64_t lock_val = node.ticket_lock.load(std::memory_order_relaxed);
-
-  uint32_t ticket = lock_val << 32 >> 32;
+// only when unlocking, it need to check whether it can handover to the next, so that it do not need to UNLOCK the global lock.
+// It is possible that the handover is set as false but this server is still holding the lock.
+  uint32_t ticket = lock_val << 32 >> 32;//
   uint32_t current = lock_val >> 32;
-
+// if the handover in node is true, then the other thread can get the lock without any RDMAcas
+// if the handover in node is false, then the other thread will acquire the lock from by RDMA cas AGAIN
   if (ticket <= current + 1) { // no pending locks
-    node.hand_over = false;
+    node.hand_over = false;// if no pending thread, then it will release the remote lock and next aquir need RDMA CAS again
   } else {
-    node.hand_over = node.hand_time < define::kMaxHandOverTime;
+    node.hand_over = node.hand_time < define::kMaxHandOverTime; // check the limit
   }
   if (!node.hand_over) {
-    node.hand_time = 0;
+    node.hand_time = 0;// clear the handtime.
   } else {
     handover_count[dsm->getMyThreadID()][0]++;
   }

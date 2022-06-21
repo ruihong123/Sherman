@@ -213,7 +213,12 @@ inline bool IndexCache::invalidate(const CacheEntry *entry) {
   if (__sync_bool_compare_and_swap(&(entry->ptr), ptr, 0)) {
       std::unique_lock<std::mutex> lk(mutex_pool[(uint64_t)(ptr)%1000]);
     free(ptr);
-    free_page_cnt.fetch_add(1);
+//    free_page_cnt.fetch_add(1);
+      if (free_page_cnt.fetch_add(1)%10000 == 0){
+          printf("Cache is still invalidated\n");
+          statistics();
+      }
+
     return true;
   }
 
