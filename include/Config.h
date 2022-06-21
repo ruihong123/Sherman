@@ -18,7 +18,7 @@ public:
   uint64_t dsmSize; // G
 
   DSMConfig(const CacheConfig &cacheConfig = CacheConfig(),
-            uint32_t machineNR = 2, uint64_t dsmSize = 100)// THe dsm memory size initialize here.
+            uint32_t machineNR = 2, uint64_t dsmSize = 128)// THe dsm memory size initialize here.
       : cacheConfig(cacheConfig), MemoryNodeNum(machineNR), dsmSize(dsmSize) {}
 };
 

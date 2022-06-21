@@ -1244,8 +1244,8 @@ inline bool Tree::acquire_local_lock(GlobalAddress lock_addr, CoroContext *cxt,
 
   uint64_t lock_val = node.ticket_lock.fetch_add(1);
 
-  uint32_t ticket = lock_val << 32 >> 32;
-  uint32_t current = lock_val >> 32;
+  uint32_t ticket = lock_val << 32 >> 32;//clear the former 32 bit
+  uint32_t current = lock_val >> 32;// current is the former 32 bit in ticket lock
 
   // printf("%ud %ud\n", ticket, current);
   while (ticket != current) { // lock failed
