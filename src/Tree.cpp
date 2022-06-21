@@ -253,6 +253,7 @@ inline bool Tree::try_lock_addr(GlobalAddress lock_addr, uint64_t tag,
                 << " locked by " << (conflict_tag >> 32) << ", "
                 << (conflict_tag << 32 >> 32) << std::endl;
       assert(false);
+      exit(0);
     }
 
     bool res = dsm->cas_dm_sync(lock_addr, 0, tag, buf, cxt);
