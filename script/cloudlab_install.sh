@@ -65,11 +65,11 @@ function run_bench() {
   while [ $n -lt $nshard ]
   do
     echo "Set up the ${compute_shard[n]}"
-    ssh -o StrictHostKeyChecking=no ${compute_shard[n]}  "screen -d -m pwd && cd /users/Ruihong && sudo apt update -y && sudo apt install memcached libmemcached-dev -y && git clone https://github.com/google/cityhash && cd cityhash/ && ./configure && make all check CXXFLAGS="-g -O3" && sudo make install && cd .. && sudo apt install libboost-all-dev -y && git clone  $github_repo && cd Sherman/ && mkdir build &&  cd build && cmake -DCMAKE_BUILD_TYPE=Release .. && sudo apt-get install -y libnuma-dev  && make all -j 32 " &
+    ssh -o StrictHostKeyChecking=no ${compute_shard[n]}  "screen -d -m pwd && cd /users/Ruihong && sudo apt update -y && sudo apt install memcached libmemcached-dev -y && git clone https://github.com/google/cityhash && cd cityhash/ && sudo ./configure && sudo make all check CXXFLAGS="-g -O3" && sudo make install && cd .. && sudo apt install libboost-all-dev -y && git clone  $github_repo && cd Sherman/ && mkdir build &&  cd build && cmake -DCMAKE_BUILD_TYPE=Release .. && sudo apt-get install -y libnuma-dev  && make all -j 32 " &
 #    ssh -o StrictHostKeyChecking=no ${compute_shard[n]} "screen -d -m pwd && cd /users/Ruihong/Sherman/build && git checkout $gitbranch && git pull && make all -j 32 " &
     echo "Set up the ${memory_shard[n]}"
 #    ssh -o StrictHostKeyChecking=no ${memory_shard[n]} "screen -d -m pwd && cd /users/Ruihong/Sherman/build && git checkout $gitbranch && git pull && make all -j 32 " &
-    ssh -o StrictHostKeyChecking=no ${memory_shard[n]}  "screen -d -m pwd && cd /users/Ruihong && sudo apt update -y && sudo apt install memcached libmemcached-dev -y && git clone https://github.com/google/cityhash && cd cityhash/ && ./configure && make all check CXXFLAGS="-g -O3" && sudo make install && cd .. && sudo apt install libboost-all-dev -y && git clone  $github_repo && cd Sherman/ && mkdir build &&  cd build && cmake -DCMAKE_BUILD_TYPE=Release .. && sudo apt-get install -y libnuma-dev  && make all -j 32 " &
+    ssh -o StrictHostKeyChecking=no ${memory_shard[n]}  "screen -d -m pwd && cd /users/Ruihong && sudo apt update -y && sudo apt install memcached libmemcached-dev -y && git clone https://github.com/google/cityhash && cd cityhash/ && sudo ./configure && sudo make all check CXXFLAGS="-g -O3" && sudo make install && cd .. && sudo apt install libboost-all-dev -y && git clone  $github_repo && cd Sherman/ && mkdir build &&  cd build && cmake -DCMAKE_BUILD_TYPE=Release .. && sudo apt-get install -y libnuma-dev  && make all -j 32 " &
     n=$((n+1))
     sleep 1
   done
