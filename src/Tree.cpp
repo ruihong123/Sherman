@@ -432,19 +432,23 @@ void Tree::insert(const Key &k, const Value &v, CoroContext *cxt, int coro_id) {
   }
 
   auto root = get_root_ptr(cxt, coro_id);
-  std::cout << "The root now is " << root << std::endl;
+//  std::cout << "The root now is " << root << std::endl;
   SearchResult result;
-
   GlobalAddress p = root;
+  // this is root is to help the tree to refresh the root node because the
+  // new root broadcast is not usable if physical disaggregated.
+  bool isroot = true;
 //The page_search will be executed mulitple times if the result is not is_leaf
 next:
 
-  if (!page_search(p, k, result, cxt, coro_id)) {
+  if (!page_search(p, k, result, cxt, coro_id, false, isroot)) {
+
     std::cout << "SEARCH WARNING insert" << std::endl;
     p = get_root_ptr(cxt, coro_id);
     sleep(1);
     goto next;
   }
+  isroot = false;
 //The page_search will be executed mulitple times if the result is not is_leaf
 // Maybe it will goes to the sibling pointer or go to the children
   if (!result.is_leaf) {
@@ -475,7 +479,7 @@ bool Tree::search(const Key &k, Value &v, CoroContext *cxt, int coro_id) {
   SearchResult result;
 
   GlobalAddress p = root;
-
+//    bool isroot = true;
   bool from_cache = false;
   const CacheEntry *entry = nullptr;
   if (enable_cache) {
@@ -485,7 +489,7 @@ bool Tree::search(const Key &k, Value &v, CoroContext *cxt, int coro_id) {
       cache_hit[dsm->getMyThreadID()][0]++;
       from_cache = true;
       p = cache_addr;
-
+//      isroot = false;
     } else {
       cache_miss[dsm->getMyThreadID()][0]++;
     }
@@ -506,12 +510,17 @@ next:
       from_cache = false;
 
       p = root;
+//      isroot = true;
     } else {
       std::cout << "SEARCH WARNING search" << std::endl;
       sleep(1);
     }
     goto next;
   }
+//  else{
+//      isroot = false;
+//  }
+
   if (result.is_leaf) {
     if (result.val != kValueNull) { // find
       v = result.val;
@@ -651,7 +660,7 @@ next:
 // result
 bool Tree::page_search(GlobalAddress page_addr, const Key &k,
                        SearchResult &result, CoroContext *cxt, int coro_id,
-                       bool from_cache) {
+                       bool from_cache, bool isroot) {
   auto page_buffer = (dsm->get_rbuf(coro_id)).get_page_buffer();
   auto header = (Header *)(page_buffer + (STRUCT_OFFSET(LeafPage, hdr)));
   auto &pattern_cnt = pattern[dsm->getMyThreadID()][page_addr.nodeID];
@@ -718,6 +727,11 @@ re_read:
 
     if (k >= page->hdr.highest) { // should turn right
 //        printf("should turn right ");
+    // TODO: if this is the root node then we need to refresh the new root.
+        if (isroot){
+            // invalidate the root.
+            g_root_ptr = GlobalAddress::Null();
+        }
       result.slibing = page->hdr.sibling_ptr;
       return true;
     }

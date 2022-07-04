@@ -122,7 +122,7 @@ private:
     // next level if it is not leaf page. If it is a leaf page, just put the value in the
     // result. this funciton = fetch the page + internal page serach + leafpage search + re-read
   bool page_search(GlobalAddress page_addr, const Key &k, SearchResult &result,
-                   CoroContext *cxt, int coro_id, bool from_cache = false);
+                   CoroContext *cxt, int coro_id, bool from_cache = false, bool isroot = false);
   void internal_page_search(InternalPage *page, const Key &k,
                             SearchResult &result);
   void leaf_page_search(LeafPage *page, const Key &k, SearchResult &result);
