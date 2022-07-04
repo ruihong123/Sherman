@@ -230,7 +230,7 @@ void thread_run(int id) {
     print_counter++;
     if (print_counter%100000 == 0)
     {
-        printf("%d key-value pairs hase been inserted\r", print_counter);
+        printf("%d key-value pairs hase been executed\r", print_counter);
     }
 //      if (print_counter%100000 == 0)
 //      {

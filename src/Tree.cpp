@@ -136,7 +136,7 @@ void Tree::broadcast_new_root(GlobalAddress new_root_addr, int root_level) {
   m.type = RpcType::NEW_ROOT;
   m.addr = new_root_addr;
   m.level = root_level;
-  if (root_level >= 4) {
+  if (root_level >= 5) {
         enable_cache = true;
   }
   //TODO: When we seperate the compute from the memory, how can we broad cast the new root
@@ -432,6 +432,7 @@ void Tree::insert(const Key &k, const Value &v, CoroContext *cxt, int coro_id) {
   }
 
   auto root = get_root_ptr(cxt, coro_id);
+  std::cout << "The root now is " << root << std::endl;
   SearchResult result;
 
   GlobalAddress p = root;
