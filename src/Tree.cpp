@@ -124,6 +124,7 @@ GlobalAddress Tree::get_root_ptr(CoroContext *cxt, int coro_id) {
     dsm->read_sync(page_buffer, root_ptr_ptr, sizeof(GlobalAddress), cxt);
     GlobalAddress root_ptr = *(GlobalAddress *)page_buffer;
     std::cout << "Get new root" << root_ptr <<std::endl;
+    g_root_ptr = root_ptr;
     return root_ptr;
   } else {
     return g_root_ptr;
