@@ -36,8 +36,8 @@ bool table_scan = false;
 bool use_range_query = true;
 
 //uint64_t kKeySpace = 64 * define::MB;
-uint64_t kKeySpace = 100*1024*1024; // bigdata
-//uint64_t kKeySpace = 50*1024*1024; //cloudlab
+//uint64_t kKeySpace = 100*1024*1024; // bigdata
+uint64_t kKeySpace = 50*1024*1024; //cloudlab
 double kWarmRatio = 0.8;
 
 double zipfan = 0;
@@ -95,6 +95,7 @@ RequstGen *coro_func(int coro_id, DSM *dsm, int id) {
 Timer bench_timer;
 std::atomic<int64_t> warmup_cnt{0};
 std::atomic_bool ready{false};
+extern bool enable_cache;
 void thread_run(int id) {
     Random64 rand(id);
 
@@ -113,6 +114,7 @@ void thread_run(int id) {
   }
 
   uint64_t end_warm_key = kKeySpace;
+    enable_cache = true;
   //kWarmRatio *
   for (uint64_t i = 1; i < end_warm_key; ++i) {
       // we can not sequentially pop up the data. Otherwise there will be a bug.
@@ -178,6 +180,7 @@ void thread_run(int id) {
   Value *value_buffer = (Value *)malloc(sizeof(Value) * 1024 * 1024);
   int print_counter = 0;
   uint64_t scan_pos = 0;
+
   while (true) {
 
     if (need_stop || id >= kTthreadUpper) {
