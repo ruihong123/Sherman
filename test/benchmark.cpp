@@ -449,7 +449,7 @@ int main(int argc, char *argv[]) {
 
     printf("%d, throughput %.4f\n", dsm->getMyNodeID(), per_node_tp);
 
-    if (dsm->getMyNodeID() == 0) {
+//    if (dsm->getMyNodeID() == 0) {
       printf("cluster throughput %.3f\n", cluster_tp / 1000.0);
 
       // printf("WE %.3f HO %.3f\n", cluster_we * 1000000ull / 1.0 /
@@ -468,7 +468,7 @@ int main(int argc, char *argv[]) {
       // printf("hot count %ld\t hierarchy count %ld\t handover %ld\n",
       // hot_count,
       //        hier_count, ho_count);
-    }
+//    }
   }
 
   return 0;
