@@ -123,8 +123,8 @@ GlobalAddress Tree::get_root_ptr(CoroContext *cxt, int coro_id) {
     auto page_buffer = (dsm->get_rbuf(coro_id)).get_page_buffer();
     dsm->read_sync(page_buffer, root_ptr_ptr, sizeof(GlobalAddress), cxt);
     GlobalAddress root_ptr = *(GlobalAddress *)page_buffer;
-//    std::cout << "Get new root" << root_ptr <<std::endl;
-//    g_root_ptr = root_ptr;
+    std::cout << "Get new root" << root_ptr <<std::endl;
+    g_root_ptr = root_ptr;
     return root_ptr;
   } else {
     return g_root_ptr;
@@ -138,7 +138,7 @@ void Tree::broadcast_new_root(GlobalAddress new_root_addr, int root_level) {
   m.type = RpcType::NEW_ROOT;
   m.addr = new_root_addr;
   m.level = root_level;
-  if (root_level >= 4) {
+  if (root_level >= 5) {
         enable_cache = true;
   }
   //TODO: When we seperate the compute from the memory, how can we broad cast the new root
@@ -164,7 +164,7 @@ bool Tree::update_new_root(GlobalAddress left, const Key &k,
 //    new_root_addr.mark = 3;
   new_root->set_consistent();
   // set local cache for root address
-//  g_root_ptr = new_root_addr;
+  g_root_ptr = new_root_addr;
   dsm->write_sync(page_buffer, new_root_addr, kInternalPageSize, cxt);
   if (dsm->cas_sync(root_ptr_ptr, old_root, new_root_addr, cas_buffer, cxt)) {
     broadcast_new_root(new_root_addr, level);
@@ -441,18 +441,18 @@ void Tree::insert(const Key &k, const Value &v, CoroContext *cxt, int coro_id) {
   GlobalAddress p = root;
   // this is root is to help the tree to refresh the root node because the
   // new root broadcast is not usable if physical disaggregated.
-//  bool isroot = true;
+  bool isroot = true;
 //The page_search will be executed mulitple times if the result is not is_leaf
 next:
 
-  if (!page_search(p, k, result, cxt, coro_id, false)) {
+  if (!page_search(p, k, result, cxt, coro_id, false, isroot)) {
 
     std::cout << "SEARCH WARNING insert" << std::endl;
     p = get_root_ptr(cxt, coro_id);
     sleep(1);
     goto next;
   }
-//  isroot = false;
+  isroot = false;
 //The page_search will be executed mulitple times if the result is not is_leaf
 // Maybe it will goes to the sibling pointer or go to the children
   if (!result.is_leaf) {
