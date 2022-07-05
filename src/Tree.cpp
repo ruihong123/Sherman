@@ -123,8 +123,8 @@ GlobalAddress Tree::get_root_ptr(CoroContext *cxt, int coro_id) {
     auto page_buffer = (dsm->get_rbuf(coro_id)).get_page_buffer();
     dsm->read_sync(page_buffer, root_ptr_ptr, sizeof(GlobalAddress), cxt);
     GlobalAddress root_ptr = *(GlobalAddress *)page_buffer;
-    std::cout << "Get new root" << root_ptr <<std::endl;
-    g_root_ptr = root_ptr;
+//    std::cout << "Get new root" << root_ptr <<std::endl;
+//    g_root_ptr = root_ptr;
     return root_ptr;
   } else {
     return g_root_ptr;
@@ -441,18 +441,18 @@ void Tree::insert(const Key &k, const Value &v, CoroContext *cxt, int coro_id) {
   GlobalAddress p = root;
   // this is root is to help the tree to refresh the root node because the
   // new root broadcast is not usable if physical disaggregated.
-  bool isroot = true;
+//  bool isroot = true;
 //The page_search will be executed mulitple times if the result is not is_leaf
 next:
 
-  if (!page_search(p, k, result, cxt, coro_id, false, isroot)) {
+  if (!page_search(p, k, result, cxt, coro_id, false)) {
 
     std::cout << "SEARCH WARNING insert" << std::endl;
     p = get_root_ptr(cxt, coro_id);
     sleep(1);
     goto next;
   }
-  isroot = false;
+//  isroot = false;
 //The page_search will be executed mulitple times if the result is not is_leaf
 // Maybe it will goes to the sibling pointer or go to the children
   if (!result.is_leaf) {
