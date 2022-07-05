@@ -164,7 +164,7 @@ bool Tree::update_new_root(GlobalAddress left, const Key &k,
 //    new_root_addr.mark = 3;
   new_root->set_consistent();
   // set local cache for root address
-  g_root_ptr = new_root_addr;
+//  g_root_ptr = new_root_addr;
   dsm->write_sync(page_buffer, new_root_addr, kInternalPageSize, cxt);
   if (dsm->cas_sync(root_ptr_ptr, old_root, new_root_addr, cas_buffer, cxt)) {
     broadcast_new_root(new_root_addr, level);
