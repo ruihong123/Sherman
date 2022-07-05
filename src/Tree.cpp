@@ -76,7 +76,7 @@ Tree::Tree(DSM *dsm, uint16_t tree_id) : dsm(dsm), tree_id(tree_id){
   if (res) {
     std::cout << "Tree root pointer value " << root_addr << std::endl;
   } else {
-    // std::cout << "fail\n";
+     std::cout << "fail\n";
   }
 }
 
@@ -163,6 +163,8 @@ bool Tree::update_new_root(GlobalAddress left, const Key &k,
   // The code below is just for debugging
 //    new_root_addr.mark = 3;
   new_root->set_consistent();
+  // set local cache for root address
+  g_root_ptr = new_root_addr;
   dsm->write_sync(page_buffer, new_root_addr, kInternalPageSize, cxt);
   if (dsm->cas_sync(root_ptr_ptr, old_root, new_root_addr, cas_buffer, cxt)) {
     broadcast_new_root(new_root_addr, level);
