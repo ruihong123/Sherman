@@ -363,7 +363,7 @@ void Tree::insert_internal(const Key &k, GlobalAddress v, CoroContext *cxt,
   SearchResult result;
 
   GlobalAddress p = root;
-
+    //TODO: ADD support for root invalidate and update.
 next:
 
   if (!page_search(p, k, result, cxt, coro_id)) {
@@ -483,7 +483,7 @@ bool Tree::search(const Key &k, Value &v, CoroContext *cxt, int coro_id) {
   SearchResult result;
 
   GlobalAddress p = root;
-//    bool isroot = true;
+    bool isroot = true;
   bool from_cache = false;
   const CacheEntry *entry = nullptr;
   if (enable_cache) {
@@ -493,14 +493,14 @@ bool Tree::search(const Key &k, Value &v, CoroContext *cxt, int coro_id) {
       cache_hit[dsm->getMyThreadID()][0]++;
       from_cache = true;
       p = cache_addr;
-//      isroot = false;
+      isroot = false;
     } else {
       cache_miss[dsm->getMyThreadID()][0]++;
     }
   }
 
 next:
-  if (!page_search(p, k, result, cxt, coro_id, from_cache)) {
+  if (!page_search(p, k, result, cxt, coro_id, from_cache, isroot)) {
     if (from_cache) { // cache stale
       index_cache->invalidate(entry);
       // Comment it during the test.
@@ -514,16 +514,16 @@ next:
       from_cache = false;
 
       p = root;
-//      isroot = true;
+      isroot = true;
     } else {
       std::cout << "SEARCH WARNING search" << std::endl;
       sleep(1);
     }
     goto next;
   }
-//  else{
-//      isroot = false;
-//  }
+  else{
+      isroot = false;
+  }
 
   if (result.is_leaf) {
     if (result.val != kValueNull) { // find

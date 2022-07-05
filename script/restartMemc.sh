@@ -23,3 +23,5 @@ echo -e "delete 0C-1M\r\nquit\r" | nc ${addr} ${port}
 echo -e "delete 1C-1M\r\nquit\r" | nc ${addr} ${port}
 echo -e "delete barrier-benchmark\r\nquit\r" | nc ${addr} ${port}
 echo -e "delete barrier-warm_finish\r\nquit\r" | nc ${addr} ${port}
+
+# remember to restart the memcached every test!!!!
