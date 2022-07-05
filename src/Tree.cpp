@@ -123,8 +123,8 @@ GlobalAddress Tree::get_root_ptr(CoroContext *cxt, int coro_id) {
     auto page_buffer = (dsm->get_rbuf(coro_id)).get_page_buffer();
     dsm->read_sync(page_buffer, root_ptr_ptr, sizeof(GlobalAddress), cxt);
     GlobalAddress root_ptr = *(GlobalAddress *)page_buffer;
-//    std::cout << "Get new root" << root_ptr <<std::endl;
-//    g_root_ptr = root_ptr;
+    std::cout << "Get new root" << root_ptr <<std::endl;
+    g_root_ptr = root_ptr;
     return root_ptr;
   } else {
     return g_root_ptr;
@@ -138,7 +138,7 @@ void Tree::broadcast_new_root(GlobalAddress new_root_addr, int root_level) {
   m.type = RpcType::NEW_ROOT;
   m.addr = new_root_addr;
   m.level = root_level;
-  if (root_level >= 5) {
+  if (root_level >= 4) {
         enable_cache = true;
   }
   //TODO: When we seperate the compute from the memory, how can we broad cast the new root
