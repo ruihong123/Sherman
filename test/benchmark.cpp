@@ -155,7 +155,7 @@ void thread_run(int id) {
     tree->index_cache_statistics();
     tree->clear_statistics();
 
-    ready = true;
+    ready.store(true);
 
     warmup_cnt.store(0);
   }
