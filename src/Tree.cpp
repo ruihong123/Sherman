@@ -528,6 +528,7 @@ next:
   if (result.is_leaf) {
     if (result.val != kValueNull) { // find
       v = result.val;
+
       return true;
     }
     if (result.slibing != GlobalAddress::Null()) { // turn right
@@ -795,6 +796,8 @@ void Tree::leaf_page_search(LeafPage *page, const Key &k,
     auto &r = page->records[i];
     if (r.key == k && r.value != kValueNull && r.f_version == r.r_version) {
       result.val = r.value;
+        memcpy(result.value_padding, r.value_padding, VALUE_PADDING);
+//      result.value_padding = r.value_padding;
       break;
     }
   }
@@ -949,6 +952,8 @@ bool Tree::leaf_page_store(GlobalAddress page_addr, const Key &k,
 
   GlobalAddress lock_addr;
 
+
+    char padding[VALUE_PADDING];
 #ifdef CONFIG_ENABLE_EMBEDDING_LOCK
   lock_addr = page_addr;
 #else
@@ -1015,6 +1020,9 @@ bool Tree::leaf_page_store(GlobalAddress page_addr, const Key &k,
       cnt++;
       if (r.key == k) {
         r.value = v;
+        // ADD MORE weight for write.
+        memcpy(r.value_padding, padding, VALUE_PADDING);
+
         r.f_version++;
         r.r_version = r.f_version;
         update_addr = (char *)&r;
@@ -1036,6 +1044,7 @@ bool Tree::leaf_page_store(GlobalAddress page_addr, const Key &k,
     auto &r = page->records[empty_index];
     r.key = k;
     r.value = v;
+    memcpy(r.value_padding, padding, VALUE_PADDING);
     r.f_version++;
     r.r_version = r.f_version;
 

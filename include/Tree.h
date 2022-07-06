@@ -43,7 +43,9 @@ struct SearchResult {
   GlobalAddress slibing;
   GlobalAddress next_level;
   Key upper_key;
+  char key_padding[KEY_PADDING];
   Value val;
+  char value_padding[VALUE_PADDING];
 };
 
 class InternalPage;
