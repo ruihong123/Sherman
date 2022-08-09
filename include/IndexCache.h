@@ -67,6 +67,9 @@ inline bool IndexCache::add_entry(const Key &from, const Key &to,
   auto buf = skiplist->AllocateKey(sizeof(CacheEntry));
   auto &e = *(CacheEntry *)buf;
   e.from = from;
+  // since the range for every node is [lowest, highest), and the the skip list will
+  // find the first key that larger than or equal to the searched key. However, if the key is equal to the highest,
+  // it is not included in this node, so the "to" should be "to - 1".
   e.to = to - 1; // !IMPORTANT;
   e.ptr = ptr;
 
@@ -80,6 +83,7 @@ inline const CacheEntry *IndexCache::find_entry(const Key &from,
   CacheEntry e;
   e.from = from;
   e.to = to - 1;
+  //THe cmp is CacheEntryComparator in CacheEntry.h
   iter.Seek((char *)&e);
   if (iter.Valid()) {
     auto val = (const CacheEntry *)iter.key();
@@ -212,6 +216,7 @@ inline bool IndexCache::invalidate(const CacheEntry *entry) {
 
   if (__sync_bool_compare_and_swap(&(entry->ptr), ptr, 0)) {
       std::unique_lock<std::mutex> lk(mutex_pool[(uint64_t)(ptr)%1000]);
+      //TODO: REMOVE ENTRY FROM THE SKIP LIST.
     free(ptr);
 //    free_page_cnt.fetch_add(1);
       if (free_page_cnt.fetch_add(1)%100000 == 0){
