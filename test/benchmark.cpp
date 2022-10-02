@@ -33,6 +33,7 @@ int kThreadCount;
 int kComputeNodeCount;
 int kMemoryNodeCount;
 bool table_scan = false;
+bool random_range_scan = false;
 bool use_range_query = true;
 
 //uint64_t kKeySpace = 64 * define::MB;
@@ -180,7 +181,7 @@ void thread_run(int id) {
   Value *value_buffer = (Value *)malloc(sizeof(Value) * 1024 * 1024);
   int print_counter = 0;
   uint64_t scan_pos = 0;
-
+    int range_length = 1000*1000;
   while (true) {
 
     if (need_stop || id >= kTthreadUpper) {
@@ -189,13 +190,13 @@ void thread_run(int id) {
     }
     // the dis range is [0, 64M]
 //    uint64_t dis = mehcached_zipf_next(&state);
-    uint64_t key = rand.Next()%(kKeySpace);
+    uint64_t key;
 //    uint64_t key = to_key(dis);
 
     Value v;
 
     timer.begin();
-
+    size_t finished_ops = 0;
 #ifdef BENCH_LOCK
     if (dsm->getMyNodeID() == 0) {
       while (true)
@@ -204,8 +205,9 @@ void thread_run(int id) {
     tree->lock_bench(key);
 #else
       if (table_scan){
+
           if (use_range_query){
-              tree->range_query(scan_pos, scan_pos + 1000*1000, value_buffer);
+              finished_ops = tree->range_query(scan_pos, scan_pos + 1000*1000, value_buffer);
               scan_pos += 1000*1000;
               if(scan_pos > kKeySpace)
                   break;
@@ -216,20 +218,26 @@ void thread_run(int id) {
                   break;
           }
 
+      }else if(random_range_scan){
+          key = rand.Next()%(kKeySpace - range_length);
+          finished_ops = tree->range_query(scan_pos, scan_pos + 1000*1000, value_buffer);
 
+      }else{
+//          assert(scan_)
+          if (rand_r(&seed) % 100 < kReadRatio) { // GET
+//        printf("Get one key");
+              tree->search(key, v);
+
+          } else {
+              v = 12;
+              tree->insert(key, v);
+
+
+          }
       }
 
 
-    if (rand_r(&seed) % 100 < kReadRatio) { // GET
-//        printf("Get one key");
-      tree->search(key, v);
 
-    } else {
-      v = 12;
-      tree->insert(key, v);
-
-
-    }
     print_counter++;
     if (print_counter%100000 == 0)
     {
@@ -245,8 +253,8 @@ void thread_run(int id) {
       us_10 = LATENCY_WINDOWS - 1;
     }
     latency[id][us_10]++;
-      if (table_scan&&use_range_query){
-          tp[id][0] += 1000*1000;
+      if ((table_scan&&use_range_query) || random_range_scan){
+          tp[id][0] += finished_ops;
       }else{
           tp[id][0]++;
       }
@@ -267,10 +275,18 @@ void parse_args(int argc, char *argv[]) {
     kReadRatio = atoi(argv[3]);
     kThreadCount = atoi(argv[4]);
     int scan_number = atoi(argv[5]);
-    if(scan_number == 0)
+    if(scan_number == 0){
         table_scan = false;
-    else
+        random_range_scan = false;
+    }
+    else if (scan_number == 1){
         table_scan = true;
+        random_range_scan = false;
+    }else{
+        table_scan = false;
+        random_range_scan = true;
+    }
+
 
     printf("kComputeNodeCount %d, kMemoryNodeCount %d, kReadRatio %d, kThreadCount %d, tablescan %d\n", kComputeNodeCount,
            kMemoryNodeCount, kReadRatio, kThreadCount, scan_number);

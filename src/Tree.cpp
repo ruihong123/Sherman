@@ -414,6 +414,7 @@ void Tree::insert(const Key &k, const Value &v, CoroContext *cxt, int coro_id) {
     if (entry) { // cache hit
       auto root = get_root_ptr(cxt, coro_id);
       // this will by pass the page search.
+      // there will be a potentially bug for concurrent root update
       if (leaf_page_store(cache_addr, k, v, root, 0, cxt, coro_id, true)) {
 
         cache_hit[dsm->getMyThreadID()][0]++;
@@ -759,6 +760,12 @@ void Tree::internal_page_search(InternalPage *page, const Key &k,
 
   assert(k >= page->hdr.lowest);
   assert(k < page->hdr.highest);
+// if the record front verison is not equal to the rear version, what to do.
+    // If we pile up the index sequentially by mulitple threads the bugs will happen
+    // when muli9tple thread trying to modify the same page, because the reread for
+    // inconsistent record below is not well implemented.
+
+    //TODO (potential bug) what will happen if the last record version is not consistent?
 
   auto cnt = page->hdr.last_index + 1;
   // page->debug();
@@ -794,6 +801,10 @@ void Tree::leaf_page_search(LeafPage *page, const Key &k,
 
   for (int i = 0; i < kLeafCardinality; ++i) {
     auto &r = page->records[i];
+    // if the record front verison is not equal to the rear version, what to do.
+    // If we pile up the index sequentially by mulitple threads the bugs will happen
+    // when muli9tple thread trying to modify the same page, because the reread for
+    // inconsistent record below is not well implemented.
     if (r.key == k && r.value != kValueNull && r.f_version == r.r_version) {
       result.val = r.value;
         memcpy(result.value_padding, r.value_padding, VALUE_PADDING);
@@ -939,6 +950,7 @@ void Tree::internal_page_store(GlobalAddress page_addr, const Key &k,
     internal_page_store(up_level, split_key, sibling_addr, root, level + 1, cxt,
                         coro_id);
   } else {
+      insert_internal(split_key, sibling_addr, cxt, coro_id, level + 1);
     assert(false);
   }
 }
@@ -1108,13 +1120,14 @@ bool Tree::leaf_page_store(GlobalAddress page_addr, const Key &k,
   }
 
   page->set_consistent();
-
+    // why need split make the write and locking async?
   write_page_and_unlock(page_buffer, page_addr, kLeafPageSize, cas_buffer,
                         lock_addr, tag, cxt, coro_id, need_split);
 
   if (!need_split)
     return true;
-
+  // note: there will be a bug for the concurrent root update. because the root is not guaranteed to be the same
+  // when split pop up to the root node. Causing two nodes.
   if (root == page_addr) { // update root
     if (update_new_root(page_addr, split_key, sibling_addr, level + 1, root,
                         cxt, coro_id)) {
