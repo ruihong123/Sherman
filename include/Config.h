@@ -6,7 +6,7 @@
 class CacheConfig {
 public:
   uint32_t cacheSize;
-
+    // THis cache size is irrelevant to the index cache size, this is the size for local RDMA buffer
   CacheConfig(uint32_t cacheSize = 1) : cacheSize(cacheSize) {}
 };
 

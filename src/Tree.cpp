@@ -357,6 +357,7 @@ void Tree::lock_bench(const Key &k, CoroContext *cxt, int coro_id) {
   unlock_addr(lock_addr, 1, cas_buffer, cxt, coro_id, true);
 }
 // You need to make sure it is not the root level
+// why there is no lock coupling?
 void Tree::insert_internal(const Key &k, GlobalAddress v, CoroContext *cxt,
                            int coro_id, int level) {
   auto root = get_root_ptr(cxt, coro_id);
@@ -889,6 +890,8 @@ void Tree::internal_page_store(GlobalAddress page_addr, const Key &k,
   GlobalAddress sibling_addr;
   // THe internal node is different from leaf nodes because it has the
   // leftmost_ptr. THe internal nodes has n key but n+1 global pointers.
+  // the internal node split pick the middle key as split key and it
+  // will not existed in either of the splited node
   if (need_split) { // need split
     sibling_addr = dsm->alloc(kInternalPageSize);
     auto sibling_buf = rbuf.get_sibling_buffer();
@@ -1108,7 +1111,7 @@ bool Tree::leaf_page_store(GlobalAddress page_addr, const Key &k,
 //      assert(page_addr == root || page->hdr.last_index == m-1);
       sibling->hdr.last_index += (cnt - m);
 //      assert(sibling->hdr.last_index == cnt -m -1);
-      sibling->hdr.lowest = split_key;
+      sibling->hdr.lowest = split_key;// the lowest for leaf node is the lowest that this node contain
       sibling->hdr.highest = page->hdr.highest;
       page->hdr.highest = split_key;
 
