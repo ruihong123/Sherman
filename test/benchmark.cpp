@@ -131,7 +131,6 @@ void thread_run(int id) {
   }
     if (table_scan){
         for (uint64_t i = 1; i < end_warm_key; ++i) {
-            // we can not sequentially pop up the data. Otherwise there will be a bug.
             if (i % all_thread == my_id) {
                 Value v;
                 tree->search(to_key(i),v);
