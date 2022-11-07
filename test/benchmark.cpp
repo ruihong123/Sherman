@@ -190,6 +190,7 @@ void thread_run(int id) {
     // the dis range is [0, 64M]
 //    uint64_t dis = mehcached_zipf_next(&state);
     uint64_t key;
+      key = rand.Next()%(kKeySpace - range_length);
 //    uint64_t key = to_key(dis);
 
     Value v;
@@ -218,7 +219,7 @@ void thread_run(int id) {
           }
 
       }else if(random_range_scan){
-          key = rand.Next()%(kKeySpace - range_length);
+//          key = rand.Next()%(kKeySpace - range_length);
           finished_ops = tree->range_query(scan_pos, scan_pos + 1000*1000, value_buffer);
 
       }else{
