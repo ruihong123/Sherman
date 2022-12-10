@@ -60,7 +60,6 @@ void Directory::dirThread() {
 }
 
 void Directory::process_message(const RawMessage *m) {
-
   RawMessage *send = nullptr;
   switch (m->type) {
   case RpcType::MALLOC: {

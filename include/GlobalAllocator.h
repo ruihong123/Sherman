@@ -32,8 +32,12 @@ public:
   }
 
   GlobalAddress alloc_chunck() {
+      static size_t counter = 0;
+      if(counter++ % 32 == 0){
+          printf("The remote memory usage is %lu MB", bitmap_tail*define::kChunkSize);
+      }
 
-    GlobalAddress res = start;
+          GlobalAddress res = start;
     if (bitmap_tail >= bitmap_len) {
       assert(false);
       Debug::notifyError("shared memory space run out");
