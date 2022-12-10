@@ -26,7 +26,10 @@ public:
     bitmap_tail = 1;
   }
 
-  ~GlobalAllocator() { delete[] bitmap; }
+  ~GlobalAllocator() {
+      printf("The remote memory usage is %lu MB", bitmap_tail*define::kChunkSize);
+      delete[] bitmap;
+  }
 
   GlobalAddress alloc_chunck() {
 
