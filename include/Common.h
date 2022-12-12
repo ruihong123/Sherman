@@ -107,8 +107,8 @@ constexpr uint16_t kMaxCoro = 8;
 constexpr int64_t kPerCoroRdmaBuf = 128 * 1024;
 
 constexpr uint8_t kMaxHandOverTime = 8;
-
-constexpr int kIndexCacheSize = 10000; // MB
+//The upper limit for cache is 1TB
+constexpr int kIndexCacheSize = 1024*1024; // MB
 } // namespace define
 
 static inline unsigned long long asm_rdtsc(void) {
