@@ -111,6 +111,7 @@ inline bool IndexCache::add_to_cache(InternalPage *page) {
 
   if (this->add_entry(page->hdr.lowest, page->hdr.highest, new_page)) {
     skiplist_node_cnt.fetch_add(1);
+    //The code below make the cache bounded by the cache size.
     auto v = free_page_cnt.fetch_add(-1);
     if (v <= 0) {
       evict_one();
