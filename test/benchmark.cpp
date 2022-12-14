@@ -476,6 +476,10 @@ int main(int argc, char *argv[]) {
       // microseconds,
       //        cluster_ho * 1000000ull / 1.0 / microseconds);
         // this is the real cache hit ratge
+      if (hit * 1.0 / all == 1.0){
+          printf("switch to pure write\n");
+          kReadRatio = 0;
+      }
       printf("cache hit rate: %lf\n", hit * 1.0 / all);
       // printf("ACCESS PATTERN");
       // for (int i = 0; i < 8; ++i) {
