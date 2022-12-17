@@ -2,7 +2,7 @@
 // Created by ruihong on 5/25/22.
 //
 #include "DSMContainer.h"
-extern int kReadRatio;
+int kReadRatio;
 int kThreadCount;
 int kComputeNodeCount;
 int kMemoryNodeCount;
