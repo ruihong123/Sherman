@@ -9,6 +9,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <vector>
+#include <fstream>
 
 // #define USE_CORO
 const int kCoroCnt = 3;
@@ -477,6 +478,13 @@ int main(int argc, char *argv[]) {
       //        cluster_ho * 1000000ull / 1.0 / microseconds);
         // this is the real cache hit ratge
       if (hit * 1.0 / all >= 0.999){
+          char buffer[ 200 ];
+          snprintf( buffer, sizeof( buffer ),
+                    "%d, throughput %.4f\n", dsm->getMyNodeID(), per_node_tp );
+          std::ofstream myfile;
+          myfile.open ("pureread_performance.txt");
+          myfile << buffer;
+          myfile.close();
           printf("switch to pure write\n");
           kReadRatio = 0;
       }
