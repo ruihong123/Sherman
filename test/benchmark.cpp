@@ -386,7 +386,10 @@ int main(int argc, char *argv[]) {
 
   int count = 0;
 
-  clock_gettime(CLOCK_REALTIME, &s);
+    std::ofstream write_output_file;
+    write_output_file.open ("purewrite_performance.txt");
+
+    clock_gettime(CLOCK_REALTIME, &s);
   while (true) {
       // throutput every 10 second
     sleep(10);
@@ -490,6 +493,14 @@ int main(int argc, char *argv[]) {
           kReadRatio = 0;
           pure_write = true;
 
+      }
+
+      if (pure_write){
+          char buffer[ 200 ];
+          snprintf( buffer, sizeof( buffer ),
+                    "%d, throughput %.4f\n", dsm->getMyNodeID(), per_node_tp );
+
+          write_output_file << buffer;
       }
       printf("cache hit rate: %lf\n", hit * 1.0 / all);
       // printf("ACCESS PATTERN");
