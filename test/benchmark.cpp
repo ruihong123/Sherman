@@ -386,8 +386,7 @@ int main(int argc, char *argv[]) {
 
   int count = 0;
 
-    std::ofstream write_output_file;
-    write_output_file.open ("purewrite_performance.txt");
+
 
     clock_gettime(CLOCK_REALTIME, &s);
   while (true) {
@@ -480,6 +479,18 @@ int main(int argc, char *argv[]) {
       // printf("WE %.3f HO %.3f\n", cluster_we * 1000000ull / 1.0 /
       // microseconds,
       //        cluster_ho * 1000000ull / 1.0 / microseconds);
+
+      if (pure_write && hit * 1.0 / all >= 0.99){
+          std::ofstream write_output_file;
+          write_output_file.open ("purewrite_performance.txt");
+          char buffer[ 200 ];
+          snprintf( buffer, sizeof( buffer ),
+                    "%d, throughput %.4f\n", dsm->getMyNodeID(), per_node_tp );
+
+          write_output_file << buffer;
+          write_output_file.close();
+          exit(0);
+      }
         // this is the real cache hit ratge
       if (hit * 1.0 / all >= 0.999){
           char buffer[ 200 ];
@@ -495,13 +506,7 @@ int main(int argc, char *argv[]) {
 
       }
 
-      if (pure_write){
-          char buffer[ 200 ];
-          snprintf( buffer, sizeof( buffer ),
-                    "%d, throughput %.4f\n", dsm->getMyNodeID(), per_node_tp );
 
-          write_output_file << buffer;
-      }
       printf("cache hit rate: %lf\n", hit * 1.0 / all);
       // printf("ACCESS PATTERN");
       // for (int i = 0; i < 8; ++i) {
