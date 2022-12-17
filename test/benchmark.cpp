@@ -30,6 +30,7 @@ extern uint64_t handover_count[MAX_APP_THREAD][8];
 const int kMaxThread = 32;
 
 int kReadRatio;
+bool pure_write = false;
 int kThreadCount;
 int kComputeNodeCount;
 int kMemoryNodeCount;
@@ -226,7 +227,7 @@ void thread_run(int id) {
       }else{
 //          assert(scan_)
           key = rand.Next()%(kKeySpace);
-          if (rand_r(&seed) % 100 < kReadRatio) { // GET
+          if (!pure_write && rand_r(&seed) % 100 < kReadRatio) { // GET
 //        printf("Get one key");
               tree->search(key, v);
 
@@ -487,6 +488,8 @@ int main(int argc, char *argv[]) {
           myfile.close();
           printf("switch to pure write\n");
           kReadRatio = 0;
+          pure_write = true;
+
       }
       printf("cache hit rate: %lf\n", hit * 1.0 / all);
       // printf("ACCESS PATTERN");
