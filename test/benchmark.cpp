@@ -480,31 +480,31 @@ int main(int argc, char *argv[]) {
       // microseconds,
       //        cluster_ho * 1000000ull / 1.0 / microseconds);
 
-      if (pure_write && hit * 1.0 / all >= 0.99){
-          std::ofstream write_output_file;
-          write_output_file.open ("purewrite_performance.txt");
-          char buffer[ 200 ];
-          snprintf( buffer, sizeof( buffer ),
-                    "%d, throughput %.4f\n", dsm->getMyNodeID(), per_node_tp );
-
-          write_output_file << buffer;
-          write_output_file.close();
-          exit(0);
-      }
-        // this is the real cache hit ratge
-      if (hit * 1.0 / all >= 0.999){
-          char buffer[ 200 ];
-          snprintf( buffer, sizeof( buffer ),
-                    "%d, throughput %.4f\n", dsm->getMyNodeID(), per_node_tp );
-          std::ofstream myfile;
-          myfile.open ("pureread_performance.txt");
-          myfile << buffer;
-          myfile.close();
-          printf("switch to pure write\n");
-          kReadRatio = 0;
-          pure_write = true;
-
-      }
+//      if (pure_write && hit * 1.0 / all >= 0.99){
+//          std::ofstream write_output_file;
+//          write_output_file.open ("purewrite_performance.txt");
+//          char buffer[ 200 ];
+//          snprintf( buffer, sizeof( buffer ),
+//                    "%d, throughput %.4f\n", dsm->getMyNodeID(), per_node_tp );
+//
+//          write_output_file << buffer;
+//          write_output_file.close();
+//          exit(0);
+//      }
+//        // this is the real cache hit ratge
+//      if (hit * 1.0 / all >= 0.999){
+//          char buffer[ 200 ];
+//          snprintf( buffer, sizeof( buffer ),
+//                    "%d, throughput %.4f\n", dsm->getMyNodeID(), per_node_tp );
+//          std::ofstream myfile;
+//          myfile.open ("pureread_performance.txt");
+//          myfile << buffer;
+//          myfile.close();
+//          printf("switch to pure write\n");
+//          kReadRatio = 0;
+//          pure_write = true;
+//
+//      }
 
 
       printf("cache hit rate: %lf\n", hit * 1.0 / all);
