@@ -30,6 +30,7 @@ extern uint64_t handover_count[MAX_APP_THREAD][8];
 const int kMaxThread = 32;
 
 int kReadRatio;
+bool pure_write = false;
 int kThreadCount;
 int kComputeNodeCount;
 int kMemoryNodeCount;
@@ -132,7 +133,6 @@ void thread_run(int id) {
         }
       if (i % 4000000 == 0 && id ==0){
           printf("warm up number: %lu\n", i);
-          fflush(stdout);
       }
   }
     if (table_scan){
@@ -231,7 +231,7 @@ void thread_run(int id) {
       }else{
 //          assert(scan_)
           key = rand.Next()%(kKeySpace);
-          if (rand_r(&seed) % 100 < kReadRatio) { // GET
+          if (!pure_write && rand_r(&seed) % 100 < kReadRatio) { // GET
 //        printf("Get one key");
               tree->search(key, v);
 
@@ -390,7 +390,9 @@ int main(int argc, char *argv[]) {
 
   int count = 0;
 
-  clock_gettime(CLOCK_REALTIME, &s);
+
+
+    clock_gettime(CLOCK_REALTIME, &s);
   while (true) {
       // throutput every 10 second
     sleep(10);
@@ -494,6 +496,34 @@ int main(int argc, char *argv[]) {
 //          printf("switch to pure write\n");
 //          kReadRatio = 0;
 //      }
+
+//      if (pure_write && hit * 1.0 / all >= 0.99){
+//          std::ofstream write_output_file;
+//          write_output_file.open ("purewrite_performance.txt");
+//          char buffer[ 200 ];
+//          snprintf( buffer, sizeof( buffer ),
+//                    "%d, throughput %.4f\n", dsm->getMyNodeID(), per_node_tp );
+//
+//          write_output_file << buffer;
+//          write_output_file.close();
+//          exit(0);
+//      }
+//        // this is the real cache hit ratge
+//      if (hit * 1.0 / all >= 0.999){
+//          char buffer[ 200 ];
+//          snprintf( buffer, sizeof( buffer ),
+//                    "%d, throughput %.4f\n", dsm->getMyNodeID(), per_node_tp );
+//          std::ofstream myfile;
+//          myfile.open ("pureread_performance.txt");
+//          myfile << buffer;
+//          myfile.close();
+//          printf("switch to pure write\n");
+//          kReadRatio = 0;
+//          pure_write = true;
+//
+//      }
+
+
       printf("cache hit rate: %lf\n", hit * 1.0 / all);
       fflush(stdout);
       // printf("ACCESS PATTERN");
