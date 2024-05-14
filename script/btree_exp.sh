@@ -91,12 +91,12 @@ launch () {
   echo "done for ${dist_ratio}"
 }
 
-#run_tpcc () {
-#  dist_ratios=(0)
-#  for dist_ratio in ${dist_ratios[@]}; do
-#    launch ${dist_ratio}
-#  done
-#}
+run_ycsb () {
+  dist_ratios=(0)
+  for dist_ratio in ${dist_ratios[@]}; do
+    launch ${dist_ratio}
+  done
+}
 
 #vary_read_ratios () {
 #  #read_ratios=(0 30 50 70 90 100)
@@ -116,7 +116,7 @@ vary_thread_number () {
   for thread_n in ${thread_number[@]}; do
     for read_r in ${read_ratio[@]}; do
       ARGS="$read_r $thread_n 0"
-      run_tpcc
+      run_ycsb
     done
   done
 }
