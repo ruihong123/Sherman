@@ -808,7 +808,9 @@ void Tree::leaf_page_search(LeafPage *page, const Key &k,
     // inconsistent record below is not well implemented.
     if (r.key == k && r.value != kValueNull && r.f_version == r.r_version) {
       result.val = r.value;
+#ifdef PADDED_VALUE
         memcpy(result.value_padding, r.value_padding, VALUE_PADDING);
+#endif
 //      result.value_padding = r.value_padding;
       break;
     }
@@ -1035,9 +1037,10 @@ bool Tree::leaf_page_store(GlobalAddress page_addr, const Key &k,
       cnt++;
       if (r.key == k) {
         r.value = v;
+#ifdef PADDED_VALUE
         // ADD MORE weight for write.
         memcpy(r.value_padding, padding, VALUE_PADDING);
-
+#endif
         r.f_version++;
         r.r_version = r.f_version;
         update_addr = (char *)&r;
@@ -1059,7 +1062,9 @@ bool Tree::leaf_page_store(GlobalAddress page_addr, const Key &k,
     auto &r = page->records[empty_index];
     r.key = k;
     r.value = v;
+#ifdef PADDED_VALUE
     memcpy(r.value_padding, padding, VALUE_PADDING);
+#endif
     r.f_version++;
     r.r_version = r.f_version;
 

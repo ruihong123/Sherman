@@ -197,9 +197,12 @@ class LeafEntry {
 public:
   uint8_t f_version : 4;
   Key key;
-  char key_padding[KEY_PADDING];
+
   Value value;
-  char value_padding[VALUE_PADDING];
+#ifdef PADDED_VALUE
+    char key_padding[KEY_PADDING];
+    char value_padding[VALUE_PADDING];
+#endif
   uint8_t r_version : 4;
 
   LeafEntry() {

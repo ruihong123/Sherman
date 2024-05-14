@@ -53,6 +53,9 @@
 
 #define kLeafPageSize 2*1024
 
+//#define PADDED_VALUE
+
+
 #define KEY_PADDING 12
 
 #define VALUE_PADDING 392

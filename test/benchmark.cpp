@@ -38,8 +38,12 @@ bool random_range_scan = false;
 bool use_range_query = true;
 
 //uint64_t kKeySpace = 64 * define::MB;
-uint64_t kKeySpace = 100*1024*1024; // bigdata
-//uint64_t kKeySpace = 50*1024*1024; //cloudlab
+#ifdef PADDED_VALUE
+//uint64_t kKeySpace = 100*1024*1024; // bigdata
+uint64_t kKeySpace = 50*1024*1024; //cloudlab
+#else
+uint64_t kKeySpace = 512*1024*1024; //8 key 8 value
+#endif
 double kWarmRatio = 0.8;
 
 double zipfan = 0;
@@ -128,6 +132,7 @@ void thread_run(int id) {
         }
       if (i % 4000000 == 0 && id ==0){
           printf("warm up number: %lu\n", i);
+          fflush(stdout);
       }
   }
     if (table_scan){
@@ -473,22 +478,24 @@ int main(int argc, char *argv[]) {
 //    if (dsm->getMyNodeID() == 0) {
       printf("cluster throughput %.3f\n", cluster_tp / 1000.0);
 
+
       // printf("WE %.3f HO %.3f\n", cluster_we * 1000000ull / 1.0 /
       // microseconds,
       //        cluster_ho * 1000000ull / 1.0 / microseconds);
         // this is the real cache hit ratge
-      if (hit * 1.0 / all >= 0.999){
-          char buffer[ 200 ];
-          snprintf( buffer, sizeof( buffer ),
-                    "%d, throughput %.4f\n", dsm->getMyNodeID(), per_node_tp );
-          std::ofstream myfile;
-          myfile.open ("pureread_performance.txt");
-          myfile << buffer;
-          myfile.close();
-          printf("switch to pure write\n");
-          kReadRatio = 0;
-      }
+//      if (hit * 1.0 / all >= 0.999){
+//          char buffer[ 200 ];
+//          snprintf( buffer, sizeof( buffer ),
+//                    "%d, throughput %.4f\n", dsm->getMyNodeID(), per_node_tp );
+//          std::ofstream myfile;
+//          myfile.open ("pureread_performance.txt");
+//          myfile << buffer;
+//          myfile.close();
+//          printf("switch to pure write\n");
+//          kReadRatio = 0;
+//      }
       printf("cache hit rate: %lf\n", hit * 1.0 / all);
+      fflush(stdout);
       // printf("ACCESS PATTERN");
       // for (int i = 0; i < 8; ++i) {
       //   printf("\t%ld", pp[i]);
