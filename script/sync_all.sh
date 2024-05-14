@@ -10,7 +10,7 @@ bin=`dirname "$0"`
 bin=`cd "$bin"; pwd`
 SRC_HOME=$bin/..
 BIN_HOME=$bin/../release
-github_repo="https://github.com/ruihong123/MemoryEngine"
+github_repo="https://github.com/ruihong123/Sherman"
 gitbranch="reserved_branch1"
 function run_bench() {
   communication_port=()
