@@ -310,7 +310,7 @@ void Tree::write_page_and_unlock(char *page_buffer, GlobalAddress page_addr,
     releases_local_lock(lock_addr);
     return;
   }
-
+    //TODO: make the write unlock not RDMA write, use RDMA cas.
   RdmaOpRegion rs[2];
   rs[0].source = (uint64_t)page_buffer;
   rs[0].dest = page_addr;
@@ -322,12 +322,13 @@ void Tree::write_page_and_unlock(char *page_buffer, GlobalAddress page_addr,
   rs[1].size = sizeof(uint64_t);
 
   rs[1].is_lock_mr = true;
-
+//    auto tag = dsm->getThreadTag();
   *(uint64_t *)rs[1].source = 0;
   if (async) {
-    dsm->write_batch(rs, 2, false);
+//    dsm->write_batch(rs, 2, false);
+      dsm->write_cas(rs[0],rs[1], tag, 0, false, cxt);
   } else {
-    dsm->write_batch_sync(rs, 2, cxt);
+    dsm->write_cas_sync(rs[0],rs[1], 0, tag, cxt);
   }
 
   releases_local_lock(lock_addr);
