@@ -53,10 +53,10 @@ echo "launch..."
 
 launch () {
 
-  read -r -a memcached_node <<< $(head -n 1 $proj_dir/memcached_ip.conf)
-  echo "restart memcached on ${memcached_node[0]}"
-  ssh -o StrictHostKeyChecking=no ${memcached_node[0]} "sudo service memcached restart"
-  rm /proj/purduedb-PG0/logs/core
+#  read -r -a memcached_node <<< $(head -n 1 $proj_dir/memcached_ip.conf)
+#  echo "restart memcached on ${memcached_node[0]}"
+#  ssh -o StrictHostKeyChecking=no ${memcached_node[0]} "sudo service memcached restart"
+#  rm /proj/purduedb-PG0/logs/core
 
   dist_ratio=$1
   echo "start tpcc for dist_ratio ${dist_ratio}"
