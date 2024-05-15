@@ -111,8 +111,8 @@ function run_bench() {
   port=$(awk 'NR==2{print}' ../memcached.conf)
 
   # init
-  echo -e "set serverNum 0 0 1\r\n0\r\nquit\r" | nc ${addr} ${port}
-  echo -e "set clientNum 0 0 1\r\n0\r\nquit\r" | nc ${addr} ${port}
+  echo -e "set ComputeNum 0 0 1\r\n0\r\nquit\r" | nc ${addr} ${port}
+  echo -e "set MemoryNum 0 0 1\r\n0\r\nquit\r" | nc ${addr} ${port}
 
 	}
 	run_bench
