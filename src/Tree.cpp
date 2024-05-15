@@ -669,7 +669,8 @@ bool Tree::page_search(GlobalAddress page_addr, const Key &k,
                        SearchResult &result, CoroContext *cxt, int coro_id,
                        bool from_cache, bool isroot) {
   auto page_buffer = (dsm->get_rbuf(coro_id)).get_page_buffer();
-  auto header = (Header *)(page_buffer + (STRUCT_OFFSET(LeafPage, hdr)));
+  char local_buffer[kLeafPageSize] = {};
+    auto header = (Header *)(local_buffer + (STRUCT_OFFSET(LeafPage, hdr)));
   auto &pattern_cnt = pattern[dsm->getMyThreadID()][page_addr.nodeID];
 
   int counter = 0;
@@ -678,7 +679,20 @@ re_read:
     printf("re read too many times\n");
     sleep(1);
   }
+  //we need three RDMA round trips to guarantee the correctness here.
+  // front version, page content, back veriosn.
+  GlobalAddress front_version_addr = page_addr;
+  front_version_addr.offset += STRUCT_OFFSET(LeafPage,front_version);
+    GlobalAddress back_version_addr = page_addr ;
+    back_version_addr.offset += STRUCT_OFFSET(LeafPage,rear_version);
+
+          page_addr + STRUCT_OFFSET(LeafPage,front_version);
+    dsm->read_sync(page_buffer, front_version_addr, sizeof(uint8_t), cxt);
+    uint8_t front_v = *(uint8_t*) page_buffer;
   dsm->read_sync(page_buffer, page_addr, kLeafPageSize, cxt);
+    memcpy(local_buffer, page_buffer, kLeafPageSize);
+    dsm->read_sync(page_buffer, back_version_addr, sizeof(uint8_t), cxt);
+    uint8_t rear_v = *(uint8_t*) page_buffer;
   pattern_cnt++;
   memset(&result, 0, sizeof(result));
   result.is_leaf = header->leftmost_ptr == GlobalAddress::Null();
@@ -690,8 +704,8 @@ re_read:
   // std::endl;
 
   if (result.is_leaf) {
-    auto page = (LeafPage *)page_buffer;
-    if (!page->check_consistent()) {
+    auto page = (LeafPage *)local_buffer;
+    if (!page->check_consistent() | (front_v != rear_v)) {
       goto re_read;
     }
 
@@ -715,7 +729,7 @@ re_read:
 
       assert(result.level != 0);
     assert(!from_cache);
-    auto page = (InternalPage *)page_buffer;
+    auto page = (InternalPage *)local_buffer;
 //      assert(page->records[page->hdr.last_index].ptr != GlobalAddress::Null());
 
     if (!page->check_consistent()) {
