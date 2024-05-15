@@ -43,8 +43,8 @@ bool use_range_query = true;
 //uint64_t kKeySpace = 100*1024*1024; // bigdata
 uint64_t kKeySpace = 50*1024*1024; //cloudlab
 #else
-//uint64_t kKeySpace = 512*1024*1024; //8 key 8 value
-uint64_t kKeySpace = 50*1024*1024; //8 key 8 value
+uint64_t kKeySpace = 512*1024*1024; //8 key 8 value
+//uint64_t kKeySpace = 50*1024*1024; //8 key 8 value
 #endif
 double kWarmRatio = 0.8;
 
