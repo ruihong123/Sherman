@@ -231,7 +231,9 @@ void thread_run(int id) {
 
       }else if(use_zipf){
           key = mehcached_zipf_next(&state);
-          printf("generated key is %lu\n", key);
+          if (finished_ops % 5000 == 0){
+              printf("key is %lu\n", key);
+          }
           if (!pure_write && rand_r(&seed) % 100 < kReadRatio) { // GET
               tree->search(key, v);
           } else {
