@@ -229,7 +229,19 @@ void thread_run(int id) {
           key = rand.Next()%(kKeySpace - range_length);
           finished_ops = tree->range_query(scan_pos, scan_pos + 1000*1000, value_buffer);
 
-      }else{
+      }else if(zipfan > 0){
+          key = mehcached_zipf_next(&state);
+          if (!pure_write && rand_r(&seed) % 100 < kReadRatio) { // GET
+              printf("generated key is %lu\n", key);
+              tree->search(key, v);
+          } else {
+              v = 12;
+              tree->insert(key, v);
+
+
+          }
+      }
+      else{
 //          assert(scan_)
           key = rand.Next()%(kKeySpace);
           if (!pure_write && rand_r(&seed) % 100 < kReadRatio) { // GET

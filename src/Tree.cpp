@@ -328,7 +328,7 @@ void Tree::write_page_and_unlock(char *page_buffer, GlobalAddress page_addr,
 //    dsm->write_batch(rs, 2, false);
       dsm->write_cas(rs[0],rs[1], tag, 0, false, cxt);
   } else {
-    dsm->write_cas_sync(rs[0],rs[1], 0, tag, cxt);
+    dsm->write_cas_sync(rs[0],rs[1], tag, 0, cxt);
   }
 
   releases_local_lock(lock_addr);
