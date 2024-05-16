@@ -47,8 +47,8 @@ uint64_t kKeySpace = 512*1024*1024; //8 key 8 value
 //uint64_t kKeySpace = 50*1024*1024; //8 key 8 value
 #endif
 double kWarmRatio = 0.8;
-
-double zipfan = 1;
+bool use_zipf = true;
+double zipfan =0;
 
 std::thread th[kMaxThread];
 uint64_t tp[kMaxThread][8];
@@ -229,7 +229,7 @@ void thread_run(int id) {
           key = rand.Next()%(kKeySpace - range_length);
           finished_ops = tree->range_query(scan_pos, scan_pos + 1000*1000, value_buffer);
 
-      }else if(zipfan > 0){
+      }else if(use_zipf){
           key = mehcached_zipf_next(&state);
           if (!pure_write && rand_r(&seed) % 100 < kReadRatio) { // GET
               printf("generated key is %lu\n", key);
