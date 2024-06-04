@@ -682,27 +682,25 @@ re_read:
   }
   //we need three RDMA round trips to guarantee the correctness here.
   // front version, page content, back veriosn.
-//  GlobalAddress front_version_addr = page_addr;
-//  front_version_addr.offset += STRUCT_OFFSET(LeafPage,front_version);
-//    GlobalAddress back_version_addr = page_addr ;
-//    back_version_addr.offset += STRUCT_OFFSET(LeafPage,rear_version);
-//
-//          page_addr + STRUCT_OFFSET(LeafPage,front_version);
-//          //TODO: The read page three times for invalidation.
-//    dsm->read_sync(page_buffer, front_version_addr, sizeof(uint8_t), cxt);
-//    uint8_t front_v = *(uint8_t*) page_buffer;
-//  dsm->read_sync(page_buffer, page_addr, kLeafPageSize, cxt);
-//    memcpy(local_buffer, page_buffer, kLeafPageSize);
-//    dsm->read_sync(page_buffer, back_version_addr, sizeof(uint8_t), cxt);
-//    uint8_t rear_v = *(uint8_t*) page_buffer;
+  GlobalAddress front_version_addr = page_addr;
+  front_version_addr.offset += STRUCT_OFFSET(LeafPage,front_version);
+    GlobalAddress back_version_addr = page_addr ;
+    back_version_addr.offset += STRUCT_OFFSET(LeafPage,rear_version);
+     //TODO: The read page three times for invalidation.
+    dsm->read_sync(page_buffer, front_version_addr, sizeof(uint8_t), cxt);
+    uint8_t front_v = *(uint8_t*) page_buffer;
+  dsm->read_sync(page_buffer, page_addr, kLeafPageSize, cxt);
+    memcpy(local_buffer, page_buffer, kLeafPageSize);
+    dsm->read_sync(page_buffer, back_version_addr, sizeof(uint8_t), cxt);
+    uint8_t rear_v = *(uint8_t*) page_buffer;
 
     //TODO: The read page three times for invalidation.
-    dsm->read_sync(page_buffer, page_addr, kLeafPageSize, cxt);
-    uint8_t front_v = *(uint8_t*) (page_buffer + (STRUCT_OFFSET(LeafPage, front_version)));
-    dsm->read_sync(page_buffer, page_addr, kLeafPageSize, cxt);
-    memcpy(local_buffer, page_buffer, kLeafPageSize);
-    dsm->read_sync(page_buffer, page_addr, kLeafPageSize, cxt);
-    uint8_t rear_v = *(uint8_t*) (page_buffer + (STRUCT_OFFSET(LeafPage, front_version)));
+//    dsm->read_sync(page_buffer, page_addr, kLeafPageSize, cxt);
+//    uint8_t front_v = *(uint8_t*) (page_buffer + (STRUCT_OFFSET(LeafPage, front_version)));
+//    dsm->read_sync(page_buffer, page_addr, kLeafPageSize, cxt);
+//    memcpy(local_buffer, page_buffer, kLeafPageSize);
+//    dsm->read_sync(page_buffer, page_addr, kLeafPageSize, cxt);
+//    uint8_t rear_v = *(uint8_t*) (page_buffer + (STRUCT_OFFSET(LeafPage, front_version)));
   pattern_cnt++;
   memset(&result, 0, sizeof(result));
   result.is_leaf = header->leftmost_ptr == GlobalAddress::Null();
