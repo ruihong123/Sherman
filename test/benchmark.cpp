@@ -43,11 +43,11 @@ bool use_range_query = true;
 //uint64_t kKeySpace = 100*1024*1024; // bigdata
 uint64_t kKeySpace = 50*1024*1024; //cloudlab
 #else
-uint64_t kKeySpace = 1024*1024*1024; //8 key 8 value
+uint64_t kKeySpace = 1024ull*1024ull*1024ull; //8 key 8 value
 //uint64_t kKeySpace = 50*1024*1024; //8 key 8 value
 #endif
 double kWarmRatio = 0.8;
-bool use_zipf = false;
+bool use_zipf = true;
 double zipfan =0.99;
 
 std::thread th[kMaxThread];
