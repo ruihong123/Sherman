@@ -48,7 +48,7 @@ uint64_t kKeySpace = 50ull*1024ull*1024ull; //8 key 8 value
 //uint64_t kKeySpace = 50*1024*1024; //8 key 8 value
 #endif
 double kWarmRatio = 0.8;
-bool use_zipf = true;
+bool use_zipf = false;
 double zipfan =0.99;
 
 std::thread th[kMaxThread];
