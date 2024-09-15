@@ -84,9 +84,9 @@ function run_bench() {
 #    ssh -o StrictHostKeyChecking=no $node "sudo apt-get install -y libnuma-dev numactl htop libmemcached-dev libboost-all-dev" &
     rsync -a $home_dir $node:$home_dir
 #    ssh -o StrictHostKeyChecking=no $node "killall micro_bench memory_server_term > /dev/null 2>&1"
-    ssh -o StrictHostKeyChecking=no $node "pkill -f MemoryServer"
-    ssh -o StrictHostKeyChecking=no $node "pkill -f benchmark"
-    ssh -o StrictHostKeyChecking=no $node "rm $home_dir/scripts/log*"
+    ssh -o StrictHostKeyChecking=no $node "pkill -f MemoryServer"&
+    ssh -o StrictHostKeyChecking=no $node "pkill -f benchmark"&
+    ssh -o StrictHostKeyChecking=no $node "rm $home_dir/scripts/log*"&
 #    ssh -o StrictHostKeyChecking=no $node "echo '/proj/purduedb-PG0/logs/core$node' | sudo tee /proc/sys/kernel/core_pattern"
   done
   for node in ${compute_shard[@]}
@@ -95,9 +95,9 @@ function run_bench() {
 #    ssh -o StrictHostKeyChecking=no $node "sudo apt-get install -y libnuma-dev numactl htop libmemcached-dev libboost-all-dev" &
     rsync -a $home_dir $node:$home_dir
 #    ssh -o StrictHostKeyChecking=no $node "killall micro_bench memory_server_term > /dev/null 2>&1"
-    ssh -o StrictHostKeyChecking=no $node "pkill -f MemoryServer"
-    ssh -o StrictHostKeyChecking=no $node "pkill -f benchmark"
-    ssh -o StrictHostKeyChecking=no $node "rm $home_dir/scripts/log*"
+    ssh -o StrictHostKeyChecking=no $node "pkill -f MemoryServer" &
+    ssh -o StrictHostKeyChecking=no $node "pkill -f benchmark" &
+    ssh -o StrictHostKeyChecking=no $node "rm $home_dir/scripts/log*"&
 
 #    ssh -o StrictHostKeyChecking=no $node "echo '/proj/purduedb-PG0/logs/core$node' | sudo tee /proc/sys/kernel/core_pattern"
 
