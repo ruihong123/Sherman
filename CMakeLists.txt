@@ -6,7 +6,7 @@ project(Sherman)
 
 #Compiler options
 # set(CMAKE_C_FLAGS "-Wall -Wno-deprecated-declarations -Wsign-compare -DNDEBUG -g")
-set(CMAKE_C_FLAGS "-Wall -Wno-deprecated-declarations -Wsign-compare") #-fsanitize=address
+set(CMAKE_C_FLAGS "-Wall -Wno-deprecated-declarations -Wsign-compare -o3 -ggdb") #-fsanitize=address
 set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -std=c++11 ")
 
 # Link Options
