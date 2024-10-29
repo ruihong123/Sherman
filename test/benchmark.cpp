@@ -136,6 +136,7 @@ void thread_run(int id) {
         }
       if (i % 4000000 == 0 && id ==0){
           printf("warm up number: %lu\n", i);
+          fflush(stdout);
       }
   }
     if (table_scan){
