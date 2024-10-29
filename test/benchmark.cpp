@@ -125,6 +125,8 @@ void thread_run(int id) {
 
   uint64_t end_warm_key = kKeySpace;
     enable_cache = true;
+    printf("Total key space is %lu\n", kKeySpace);
+    fflush(stdout);
   //kWarmRatio *
   for (uint64_t i = 1; i < end_warm_key; ++i) {
       // we can not sequentially pop up the data. Otherwise there will be a bug.
@@ -133,7 +135,7 @@ void thread_run(int id) {
         tree->insert(to_key(i), i * 2);
 //        tree->insert(rand.Next()%(kKeySpace), i * 2);
 
-        }
+      }
       if (i % 4000000 == 0 && id ==0){
           printf("warm up number: %lu\n", i);
           fflush(stdout);
