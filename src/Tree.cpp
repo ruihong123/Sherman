@@ -445,15 +445,19 @@ void Tree::insert(const Key &k, const Value &v, CoroContext *cxt, int coro_id) {
   // this is root is to help the tree to refresh the root node because the
   // new root broadcast is not usable if physical disaggregated.
   bool isroot = true;
-//The page_search will be executed mulitple times if the result is not is_leaf
+    //The page_search will be executed mulitple times if the result is not is_leaf
 next:
-
   if (!page_search(p, k, result, cxt, coro_id, false, isroot)) {
+      if (isroot){
+          std::cout << "SEARCH WARNING insert" << std::endl;
+          p = get_root_ptr(cxt, coro_id);
+          sleep(1);
+          goto next;
+      }else{
+          p =  path_stack[coro_id][result.level+1];
+          goto next;
+      }
 
-    std::cout << "SEARCH WARNING insert" << std::endl;
-    p = get_root_ptr(cxt, coro_id);
-    sleep(1);
-    goto next;
   }
   isroot = false;
 //The page_search will be executed mulitple times if the result is not is_leaf
@@ -472,7 +476,10 @@ next:
     }
   }
 
-  leaf_page_store(p, k, v, root, 0, cxt, coro_id);
+  if(!leaf_page_store(p, k, v, root, 0, cxt, coro_id, true)){
+      p =  path_stack[coro_id][1];
+      goto next;
+  }
 
 //  if (res == HotResult::SUCC) {
 //    hot_buf.clear(k);
